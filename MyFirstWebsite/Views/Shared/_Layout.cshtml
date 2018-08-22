@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+@*@inject SignInManager<IdentityUser> signInManager;*@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/content/site.css" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            <img src="~/images/my_logo.png" width="40" height="40" />
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav nav">
+                <li class="nav-item" is-active-route asp-controller="Home" asp-action="Index">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item" is-active-route asp-controller="Home" asp-action="About">
+                    <a asp-controller="Home" asp-action="About" class="nav-link">About</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Links
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="https://github.com/Mello244688">GitHub</a>
+                        <a class="dropdown-item" href="https://www.linkedin.com/in/scott-mello">LinkedIn</a>
+                        @*<div class="dropdown-divider"></div>*@
+                    </div>
+                </li>
+                <li class="nav-item" is-active-route asp-action="Index" asp-controller="Contact">
+                    <a asp-controller="Contact" asp-action="Index" class="nav-link">Contact Me</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Fantasy Football
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
+                        <a class="dropdown-item" is-active-route asp-controller="Fantasy" asp-action="Index">ADP</a>
+                        <a class="dropdown-item" is-active-route asp-controller="Fantasy" asp-action="New">New Draft</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item">My Teams</a>
+                    </div>
+                </li>
+            </ul>
+            <partial name="_LoginPartial" />
+        </div>
+    </nav>
+
+    <partial name="_CookieConsentPartial" />
+
+    <div class="container body-content">
+        <div class="row justify-content-center">
+            @RenderBody()
+        </div>
+        <hr />
+        <footer>
+            <p>&copy; 2018 - MyProject</p>
+        </footer>
+    </div>
+    <script src="~/node_modules/jquery/dist/jquery.js"></script>
+    <script src="~/node_modules/jquery/dist/jquery.slim.min.js"></script>
+    <script src="~/node_modules/popper.js/dist/umd/popper.min.js"></script>
+    <script src="~/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/content/site.js"></script>
+</body>
+</html>

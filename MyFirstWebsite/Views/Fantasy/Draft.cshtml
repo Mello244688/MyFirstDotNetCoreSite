@@ -1,0 +1,10 @@
+﻿@model DraftViewModel
+
+<form class="form-inline my-2 my-lg-0">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+    <button class="btn btn-success" type="submit">Draft</button>
+</form>
+
+<div class="row col-md-10">
+    @await Html.PartialAsync("_Players", Model);
+</div>

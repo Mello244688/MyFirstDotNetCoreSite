@@ -1,0 +1,19 @@
+﻿<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Rank</th>
+            <th scope="col">Player</th>
+            <th scope="col">Position</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var player in Model.Players)
+        {
+            <tr>
+                <th scope="row">@player.Rank</th>
+                <td>@player.Name</td>
+                <td>@player.Position</td>
+            </tr>
+        }
+    </tbody>
+</table>

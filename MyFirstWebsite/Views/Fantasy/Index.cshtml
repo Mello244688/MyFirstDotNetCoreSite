@@ -1,0 +1,14 @@
+﻿@model FantasyViewModel
+
+<div class="row col-md-12 justify-content-center">
+    <h3>@Model.PageHeading</h3>
+</div>
+<div class="row col-md-10">
+    <form method="post" class="form-inline">
+        <select asp-items="@Html.GetEnumSelectList<ScoringType>()" asp-for="ScoringType" class="custom-select"></select>
+        <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+</div>
+<div class="row col-md-10">
+    @await Html.PartialAsync("_Players", Model);
+</div>

@@ -1,0 +1,69 @@
+﻿body {
+    background-image: url('../images/pattern.png');
+    background-repeat: repeat;
+    padding-top: 25px;
+    padding-bottom: 20px;
+}
+
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 15px;
+}
+
+@media only screen and (min-width: 600px) {
+    #carousel {
+        background-color : black;
+        width : 60vw;
+        height : 75vh;
+    }
+
+    .carousel-inner img {
+        width: auto;
+        height: 70vh;
+        display: block;
+        margin: auto;
+    }
+}
+
+.carousel-inner {
+    width: auto;
+    height: 100%;
+}
+
+.frame {
+    background-color: #ddc;
+    border: solid 5vmin #eee;
+    border-bottom-color: #fff;
+    border-left-color: #eee;
+    border-radius: 2px;
+    border-right-color: #eee;
+    border-top-color: #ddd;
+    box-shadow: 0 0 5px 0 rgba(0,0,0,.25) inset, 0 5px 10px 5px rgba(0,0,0,.25);
+    box-sizing: border-box;
+}
+
+.frame::before 
+{
+    border-radius: 2px;
+    bottom: -2vmin;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.25) inset;
+    content: "";
+    left: -2vmin;
+    position: absolute;
+    right: -2vmin;
+    top: -2vmin;
+}
+
+/*.frame::after {
+    border-radius: 2px;
+    bottom: -2.5vmin;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.25);
+    content: "";
+    left: -2.5vmin;
+    position: absolute;
+    right: -2.5vmin;
+    top: -2.5vmin;
+}*/
+
+
