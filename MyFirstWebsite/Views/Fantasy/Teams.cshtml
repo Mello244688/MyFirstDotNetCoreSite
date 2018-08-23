@@ -1,0 +1,18 @@
+﻿@model IEnumerable<Team>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>My Teams</th>
+        </tr>
+    </thead>
+
+    @foreach (var team in Model)
+    {
+        <tbody>
+            <tr>
+                <td><a asp-controller="Fantasy" asp-action="Draft" asp-route-id="@team.DraftId">League: @team.LeagueName Team: @team.TeamName</a></td>
+            </tr>
+        </tbody>
+    }
+</table>

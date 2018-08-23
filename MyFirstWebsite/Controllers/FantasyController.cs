@@ -104,19 +104,36 @@ namespace MyFirstWebsite.Controllers
             return RedirectToAction(nameof(Draft), new { id = team.Id});
         }
 
+        [Authorize]
         public IActionResult Draft(int id)
         {
             DraftViewModel draftViewModel = new DraftViewModel();
+            var userId = userManager.GetUserId(User);
 
             var draft = appDbContext.Teams
-                .Where(t => t.UserId == userManager.GetUserId(User) && t.DraftId == id)
+                .Where(t => t.UserId == userId && t.DraftId == id)
                 .Select(t => t.Draft)
                 .Include(t => t.AvailablePlayers)
-                .ThenInclude(p => p.Player);
+                .ThenInclude(p => p.Player)
+                .Include(t => t.TeamsInDraft)
+                .ThenInclude(t => t.LineUp);
+
+            var team = draft.FirstOrDefault().TeamsInDraft.Where(ts => ts.UserId == userId).FirstOrDefault();
 
             draftViewModel.Players = draft.FirstOrDefault().AvailablePlayers.Select(p => p.Player).OrderBy(p => p.Rank).ToHashSet();
+            draftViewModel.MyPlayers = team.LineUp.Select(p => p.Player).ToHashSet();
+            draftViewModel.LeagueName = team.LeagueName;
+            draftViewModel.TeamName = team.TeamName;
 
             return View(draftViewModel);
+        }
+
+        [Authorize]
+        public IActionResult Teams()
+        {
+            var teams = appDbContext.Teams.Where(t => t.UserId == userManager.GetUserId(User)).ToHashSet();
+            
+            return View(teams);
         }
 
         private string GetPageHeading(ScoringType type)

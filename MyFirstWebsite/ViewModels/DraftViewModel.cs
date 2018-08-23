@@ -10,5 +10,7 @@ namespace MyFirstWebsite.ViewModels
     {
         public HashSet<Player> MyPlayers { get; set; }
         public HashSet<Player> Players { get; set; }
+        public string LeagueName { get; set; }
+        public string TeamName { get; set; }
     }
 }

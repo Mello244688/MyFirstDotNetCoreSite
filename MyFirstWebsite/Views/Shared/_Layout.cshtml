@@ -1,5 +1,4 @@
 ﻿<!DOCTYPE html>
-@*@inject SignInManager<IdentityUser> signInManager;*@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -44,7 +43,7 @@
                         <a class="dropdown-item" is-active-route asp-controller="Fantasy" asp-action="Index">ADP</a>
                         <a class="dropdown-item" is-active-route asp-controller="Fantasy" asp-action="New">New Draft</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item">My Teams</a>
+                        <a class="dropdown-item" is-active-route asp-controller="Fantasy" asp-action="Teams">My Teams</a>
                     </div>
                 </li>
             </ul>
