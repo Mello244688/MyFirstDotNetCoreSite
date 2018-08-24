@@ -1,0 +1,20 @@
+﻿@model IEnumerable<Player>
+
+<script>
+    $(document).ready(function () {
+
+        var player = {
+            Rank: "",
+            Name: "",
+            Position: ""
+        };
+        console.log(@Model.First().Name);
+    });
+</script>
+
+<div>
+    @foreach (var player in Model)
+    {
+
+    }
+</div>

@@ -113,15 +113,15 @@ namespace MyFirstWebsite.Controllers
             var draft = appDbContext.Teams
                 .Where(t => t.UserId == userId && t.DraftId == id)
                 .Select(t => t.Draft)
-                .Include(t => t.AvailablePlayers)
-                .ThenInclude(p => p.Player)
-                .Include(t => t.TeamsInDraft)
-                .ThenInclude(t => t.LineUp);
+                //.Include(t => t.AvailablePlayers)
+                //.ThenInclude(p => p.Player)
+                .Include(t => t.TeamsInDraft);
+                //.ThenInclude(t => t.LineUp);
 
             var team = draft.FirstOrDefault().TeamsInDraft.Where(ts => ts.UserId == userId).FirstOrDefault();
 
-            draftViewModel.Players = draft.FirstOrDefault().AvailablePlayers.Select(p => p.Player).OrderBy(p => p.Rank).ToHashSet();
-            draftViewModel.MyPlayers = team.LineUp.Select(p => p.Player).ToHashSet();
+            //draftViewModel.Players = draft.FirstOrDefault().AvailablePlayers.Select(p => p.Player).OrderBy(p => p.Rank).ToHashSet();
+            //draftViewModel.MyPlayers = team.LineUp.Select(p => p.Player).ToHashSet();
             draftViewModel.LeagueName = team.LeagueName;
             draftViewModel.TeamName = team.TeamName;
 

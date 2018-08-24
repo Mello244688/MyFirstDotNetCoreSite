@@ -1,13 +1,25 @@
 ﻿@model DraftViewModel
 
-<div class="col-md-12">@Model.LeagueName</div>
-<div class="col-md-12">@Model.TeamName</div>
+@section Scripts {
+    <script src="~/content/fantasy.js"></script>
+}
 
-<form class="form-inline my-2 my-lg-0">
-    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+<div class="col-md-12">@Model.LeagueName</div>
+    <div class="col-md-12">@Model.TeamName</div>
+
+<form class="form-inline my-2 my-lg-0" id="searchBar">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchInput">
     <button class="btn btn-success" type="submit">Draft</button>
 </form>
 
-<div class="row col-md-10">
-    @await Html.PartialAsync("_Players", Model);
-</div>
+<table class="table" id="draftTable">
+    <thead>
+        <tr>
+            <th scope="col">Rank</th>
+            <th scope="col">Player</th>
+            <th scope="col">Position</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
