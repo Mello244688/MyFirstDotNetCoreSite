@@ -4,9 +4,6 @@
     var idStr = url.substring(url.lastIndexOf('/') + 1);
     var players = [];
 
-    //$('#searchInput').keyup(searchBar());
-    
-
     $.ajax({
         url: '/api/FantasyApi/GetAvailablePlayers/' + idStr,
         type: "GET",
@@ -21,7 +18,10 @@
                     name: v.name,
                     position: v.position
                 });
-                $('#draftTable tbody').append('<tr><th scope="row">' + v.rank + '</th>' + '<td><a href="https://www.fantasypros.com/nfl/players/' + formatName(v.name) + '.php" target="_blank"' + '>' + v.name + '</a></td>' + '<td>' + v.position + '</td>' + '</tr>');
+                $('#draftTable tbody').append('<tr><th scope="row">' + v.rank + '</th>' +
+                    '<td><a href="https://www.fantasypros.com/nfl/players/' + formatName(v.name) +
+                    '.php" target="_blank"' + '>' + v.name + '</a></td>' + '<td>' + v.position + '</td>' +
+                    '<td><button class="btn btn-success">Draft</button></td>' + '</tr>');
             });
         },
         error: function (result) {
@@ -30,6 +30,24 @@
     });
 
     $(document).on('keyup', '#searchInput', function () {
+        searchBar();
+    });
+
+    $(document).on('click', '#draftTable button', function () {
+        console.log($(this).closest('tr'));
+        var tr = $(this).closest('tr');
+        tr.remove();
+
+        $.ajax({
+            url: '/api/FantasyApi/RemovePlayer/' + idStr + ' ' + tr.text(),
+            type: 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+
+            }
+        });
+
+        $('#searchInput').val("");
         searchBar();
     });
 
@@ -42,7 +60,7 @@
     }
 
     function searchBar() {
-        console.log('hit');select box
+  
         var input, filter, table, tr, td, i;
 
         input = document.getElementById("searchInput");

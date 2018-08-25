@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -67,10 +68,29 @@ namespace MyFirstWebsite.Controllers
         //{
         //}
 
-        //// DELETE api/<controller>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+        [Route("api/[controller]/RemovePlayer/{player}")]
+        [HttpDelete("{player}")]
+        public void Delete(string player)
+        {
+            var id = player.Substring(0, player.IndexOf(" "));
+            int secondIndex = player.IndexOf(' ', player.IndexOf(' ') + 1);
+            var rank = player.Substring(player.IndexOf(" ") + 1, secondIndex);
+            rank = Regex.Replace(rank, "[^0-9]+", string.Empty);
+            var _rank = Convert.ToInt32(rank);
+            var _id = Convert.ToInt32(id);
+
+            var draft = appDbContext.Drafts.Where(d => d.Id == _id)
+                .Include(d => d.AvailablePlayers)
+                .ThenInclude(dp => dp.Player)
+                .Include(d => d.TeamsInDraft)
+                .ThenInclude(ts => ts.LineUp)
+                .FirstOrDefault();
+
+            var playerToRemove = draft.AvailablePlayers.Where(p => p.Player.Rank == _rank);
+
+            appDbContext.Players.Remove(playerToRemove.FirstOrDefault().Player);
+
+            appDbContext.SaveChanges();
+        }
     }
 }
