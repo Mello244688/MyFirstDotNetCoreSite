@@ -11,5 +11,7 @@ namespace MyFirstWebsite.ViewModels
         public ScoringType ScoringType { get; set; }
         public string TeamName { get; set; }
         public string LeagueName { get; set; }
+        public int DraftPosition { get; set; }
+        public int NumberOfTeams { get; set; }
     }
 }

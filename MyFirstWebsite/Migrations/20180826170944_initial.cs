@@ -48,12 +48,28 @@ namespace MyFirstWebsite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DraftedPlayer",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Rank = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Position = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DraftedPlayer", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Drafts",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ScoringType = table.Column<int>(nullable: false)
+                    ScoringType = table.Column<int>(nullable: false),
+                    NumberOfTeams = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,7 +82,7 @@ namespace MyFirstWebsite.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Rank = table.Column<string>(nullable: true),
+                    Rank = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Position = table.Column<string>(nullable: true)
                 },
@@ -182,6 +198,30 @@ namespace MyFirstWebsite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DraftDraftedPlayer",
+                columns: table => new
+                {
+                    DraftId = table.Column<int>(nullable: false),
+                    PlayerId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DraftDraftedPlayer", x => new { x.DraftId, x.PlayerId });
+                    table.ForeignKey(
+                        name: "FK_DraftDraftedPlayer_Drafts_DraftId",
+                        column: x => x.DraftId,
+                        principalTable: "Drafts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DraftDraftedPlayer_DraftedPlayer_PlayerId",
+                        column: x => x.PlayerId,
+                        principalTable: "DraftedPlayer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Teams",
                 columns: table => new
                 {
@@ -189,6 +229,7 @@ namespace MyFirstWebsite.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     LeagueName = table.Column<string>(nullable: true),
                     TeamName = table.Column<string>(nullable: true),
+                    DraftPosition = table.Column<int>(nullable: false),
                     UserId = table.Column<string>(nullable: false),
                     DraftId = table.Column<int>(nullable: false)
                 },
@@ -238,11 +279,18 @@ namespace MyFirstWebsite.Migrations
                 columns: table => new
                 {
                     TeamId = table.Column<int>(nullable: false),
-                    PlayerId = table.Column<int>(nullable: false)
+                    PlayerId = table.Column<int>(nullable: false),
+                    DraftedPlayerId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TeamPlayer", x => new { x.TeamId, x.PlayerId });
+                    table.ForeignKey(
+                        name: "FK_TeamPlayer_DraftedPlayer_DraftedPlayerId",
+                        column: x => x.DraftedPlayerId,
+                        principalTable: "DraftedPlayer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TeamPlayer_Players_PlayerId",
                         column: x => x.PlayerId,
@@ -297,9 +345,19 @@ namespace MyFirstWebsite.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DraftDraftedPlayer_PlayerId",
+                table: "DraftDraftedPlayer",
+                column: "PlayerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DraftPlayer_PlayerId",
                 table: "DraftPlayer",
                 column: "PlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeamPlayer_DraftedPlayerId",
+                table: "TeamPlayer",
+                column: "DraftedPlayerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TeamPlayer_PlayerId",
@@ -335,6 +393,9 @@ namespace MyFirstWebsite.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "DraftDraftedPlayer");
+
+            migrationBuilder.DropTable(
                 name: "DraftPlayer");
 
             migrationBuilder.DropTable(
@@ -342,6 +403,9 @@ namespace MyFirstWebsite.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "DraftedPlayer");
 
             migrationBuilder.DropTable(
                 name: "Players");

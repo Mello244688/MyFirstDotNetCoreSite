@@ -10,7 +10,7 @@ using MyFirstWebsite.Models;
 namespace MyFirstWebsite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20180820005013_initial")]
+    [Migration("20180826170944_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -192,11 +192,43 @@ namespace MyFirstWebsite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("NumberOfTeams");
+
                     b.Property<int>("ScoringType");
 
                     b.HasKey("Id");
 
                     b.ToTable("Drafts");
+                });
+
+            modelBuilder.Entity("MyFirstWebsite.Models.DraftDraftedPlayer", b =>
+                {
+                    b.Property<int>("DraftId");
+
+                    b.Property<int>("PlayerId");
+
+                    b.HasKey("DraftId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("DraftDraftedPlayer");
+                });
+
+            modelBuilder.Entity("MyFirstWebsite.Models.DraftedPlayer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Position");
+
+                    b.Property<int>("Rank");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DraftedPlayer");
                 });
 
             modelBuilder.Entity("MyFirstWebsite.Models.DraftPlayer", b =>
@@ -222,7 +254,7 @@ namespace MyFirstWebsite.Migrations
 
                     b.Property<string>("Position");
 
-                    b.Property<string>("Rank");
+                    b.Property<int>("Rank");
 
                     b.HasKey("Id");
 
@@ -236,6 +268,8 @@ namespace MyFirstWebsite.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("DraftId");
+
+                    b.Property<int>("DraftPosition");
 
                     b.Property<string>("LeagueName");
 
@@ -259,7 +293,11 @@ namespace MyFirstWebsite.Migrations
 
                     b.Property<int>("PlayerId");
 
+                    b.Property<int?>("DraftedPlayerId");
+
                     b.HasKey("TeamId", "PlayerId");
+
+                    b.HasIndex("DraftedPlayerId");
 
                     b.HasIndex("PlayerId");
 
@@ -311,6 +349,19 @@ namespace MyFirstWebsite.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("MyFirstWebsite.Models.DraftDraftedPlayer", b =>
+                {
+                    b.HasOne("MyFirstWebsite.Models.Draft", "Draft")
+                        .WithMany("PlayersDrafted")
+                        .HasForeignKey("DraftId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("MyFirstWebsite.Models.DraftedPlayer", "Player")
+                        .WithMany("DraftDraftedPlayer")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("MyFirstWebsite.Models.DraftPlayer", b =>
                 {
                     b.HasOne("MyFirstWebsite.Models.Draft", "Draft")
@@ -339,6 +390,10 @@ namespace MyFirstWebsite.Migrations
 
             modelBuilder.Entity("MyFirstWebsite.Models.TeamPlayer", b =>
                 {
+                    b.HasOne("MyFirstWebsite.Models.DraftedPlayer")
+                        .WithMany("TeamPlayer")
+                        .HasForeignKey("DraftedPlayerId");
+
                     b.HasOne("MyFirstWebsite.Models.Player", "Player")
                         .WithMany("TeamPlayer")
                         .HasForeignKey("PlayerId")

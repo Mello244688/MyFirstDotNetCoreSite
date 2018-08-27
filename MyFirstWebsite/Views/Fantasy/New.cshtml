@@ -7,15 +7,23 @@
 <form method="post">
     <div class="form-group">
         <label for="leagueName">League Name:</label>
-        <input class="form-control" type="text" placeholder="Enter League Name" id="leagueName" asp-for="LeagueName"/>       
+        <input class="form-control" type="text" placeholder="Enter League Name" id="leagueName" asp-for="LeagueName" />
     </div>
     <div class="form-group">
         <label for="teamName">Team Name:</label>
-        <input class="form-control" type="text" placeholder="Enter Team Name" id="teamName" asp-for="TeamName"/>
+        <input class="form-control" type="text" placeholder="Enter Team Name" id="teamName" asp-for="TeamName" />
     </div>
     <div class="form-group">
         <label for="scoringType">Scoring Type:</label>
         <select asp-items="@Html.GetEnumSelectList<ScoringType>()" asp-for="ScoringType" class="custom-select" id="scoringType"></select>
     </div>
-    <input class="btn btn-primary" type="submit" value="Submit"/>
+    <div class="form-group">
+        <label for="numTeams">Number Of Teams:</label>
+        <input class="form-control" type="number" placeholder="Enter the number of teams in draft" id="numTeams" asp-for="NumberOfTeams" />
+    </div>
+    <div class="form-group">
+        <label for="draftPosition">Draft Position:</label>
+        <input class="form-control" type="number" placeholder="Enter your draft position" id="draftPosition" asp-for="DraftPosition" />
+    </div>
+    <input class="btn btn-primary" type="submit" value="Submit" />
 </form>

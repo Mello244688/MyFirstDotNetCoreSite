@@ -8,7 +8,8 @@ namespace MyFirstWebsite.Models
         public int Id { get; set; }
         public string LeagueName { get; set; }
         public string TeamName { get; set; }
-        
+        public int DraftPosition { get; set; }
+
         public ICollection<TeamPlayer> LineUp { get; set; }
 
         public ApplicationUser User { get; set; }

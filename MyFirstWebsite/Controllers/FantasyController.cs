@@ -71,6 +71,7 @@ namespace MyFirstWebsite.Controllers
                 TeamName = newDraft.TeamName,
                 LineUp = new HashSet<TeamPlayer>(),
                 UserId = userManager.GetUserId(User),
+                DraftPosition = newDraft.DraftPosition,
                 Draft = new Draft()
             };
 
@@ -78,7 +79,9 @@ namespace MyFirstWebsite.Controllers
             {
                 ScoringType = newDraft.ScoringType,
                 TeamsInDraft = new HashSet<Team>(),
-                AvailablePlayers = new HashSet<DraftPlayer>()
+                AvailablePlayers = new HashSet<DraftPlayer>(),
+                NumberOfTeams = newDraft.NumberOfTeams,
+                PlayersDrafted = new HashSet<DraftDraftedPlayer>()
             };
 
             var availableDraftPlayers = new HashSet<DraftPlayer>();
@@ -94,6 +97,7 @@ namespace MyFirstWebsite.Controllers
             draft.AvailablePlayers = availableDraftPlayers;
             
             team.Draft = draft;
+            team.UserId = userManager.GetUserId(User);
             draft.TeamsInDraft.Add(team);
 
             appDbContext.Drafts.Add(draft);
@@ -113,17 +117,14 @@ namespace MyFirstWebsite.Controllers
             var draft = appDbContext.Teams
                 .Where(t => t.UserId == userId && t.DraftId == id)
                 .Select(t => t.Draft)
-                //.Include(t => t.AvailablePlayers)
-                //.ThenInclude(p => p.Player)
                 .Include(t => t.TeamsInDraft);
-                //.ThenInclude(t => t.LineUp);
 
             var team = draft.FirstOrDefault().TeamsInDraft.Where(ts => ts.UserId == userId).FirstOrDefault();
 
-            //draftViewModel.Players = draft.FirstOrDefault().AvailablePlayers.Select(p => p.Player).OrderBy(p => p.Rank).ToHashSet();
-            //draftViewModel.MyPlayers = team.LineUp.Select(p => p.Player).ToHashSet();
             draftViewModel.LeagueName = team.LeagueName;
             draftViewModel.TeamName = team.TeamName;
+            draftViewModel.NumberOfTeams = draft.FirstOrDefault().NumberOfTeams;
+            draftViewModel.DraftPosition = team.DraftPosition;
 
             return View(draftViewModel);
         }

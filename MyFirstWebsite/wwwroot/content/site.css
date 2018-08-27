@@ -59,4 +59,29 @@ table {
     background-color: white !important;
 }
 
+#draftTable, #teamTable {
+    border-collapse: collapse; /* Collapse borders */
+    width: 100%; /* Full-width */
+    border: 1px solid #ddd; /* Add a grey border */
+    font-size: 18px; /* Increase font-size */
+}
+
+#draftTable th, #draftTable td, #teamTable th, #teamTable td {
+    text-align: left; /* Left-align text */
+    padding: 12px; /* Add padding */
+}
+
+#draftTable tr, #teamTable tr {
+    /* Add a bottom border to all table rows */
+    border-bottom: 1px solid #ddd;
+}
+
+#draftTable tr.header, #draftTable tr:hover, #teamTable tr.header, #teamTable tr:hover {
+    /* Add a grey background color to the table header and on hover */
+    background-color: #f1f1f1;
+}
+
+#round, #pick {
+    text-align: center;
+}
 

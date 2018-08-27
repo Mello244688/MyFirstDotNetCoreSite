@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFirstWebsite.Models;
@@ -16,11 +17,13 @@ namespace MyFirstWebsite.Controllers
     [ApiController]
     public class FantasyApi : Controller
     {
-        private AppDbContext appDbContext;
+        private readonly AppDbContext appDbContext;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public FantasyApi(AppDbContext appDbContext)
+        public FantasyApi(AppDbContext appDbContext, UserManager<ApplicationUser> userManager)
         {
             this.appDbContext = appDbContext;
+            this.userManager = userManager;
         }
 
         [HttpGet]
@@ -41,56 +44,117 @@ namespace MyFirstWebsite.Controllers
             return Json(players);
         }
 
-
-        ////GET: api/<controller>
-        //[HttpGet]
-        //public IEnumerable<string> Get()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}
-
-        ////GET api/<controller>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        //// POST api/<controller>
-        //[HttpPost]
-        //public void Post([FromBody]string value)
-        //{
-        //}
-
-        //// PUT api/<controller>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody]string value)
-        //{
-        //}
-
-        [Route("api/[controller]/RemovePlayer/{player}")]
-        [HttpDelete("{player}")]
-        public void Delete(string player)
+        [Route("api/[controller]/RemovePlayer/{id}")]
+        [HttpDelete]
+        public void Delete([FromBody]Player player, int id)
         {
-            var id = player.Substring(0, player.IndexOf(" "));
-            int secondIndex = player.IndexOf(' ', player.IndexOf(' ') + 1);
-            var rank = player.Substring(player.IndexOf(" ") + 1, secondIndex);
-            rank = Regex.Replace(rank, "[^0-9]+", string.Empty);
-            var _rank = Convert.ToInt32(rank);
-            var _id = Convert.ToInt32(id);
+            var dPCollection = appDbContext.Players.Where(p => p.Id == player.Id)
+                .Include(p => p.DraftPlayer);
 
-            var draft = appDbContext.Drafts.Where(d => d.Id == _id)
-                .Include(d => d.AvailablePlayers)
-                .ThenInclude(dp => dp.Player)
-                .Include(d => d.TeamsInDraft)
-                .ThenInclude(ts => ts.LineUp)
+            var draftPlayerToRemove = dPCollection.FirstOrDefault().DraftPlayer
+                .Where(dp => dp.DraftId == id && dp.PlayerId == player.Id).FirstOrDefault();
+
+            appDbContext.Drafts.Where(d => d.Id == id).FirstOrDefault().AvailablePlayers.Remove(draftPlayerToRemove);
+            appDbContext.SaveChanges();
+        }
+
+        [Route("api/[controller]/AddToDrafted/{draftId}")]
+        [HttpPut]
+        public void AddPlayerToDrafted([FromBody]Player player, int draftId)
+        {
+            var draft = appDbContext.Drafts.Where(d => d.Id == draftId)
+                .Include(d => d.PlayersDrafted)
+                .ThenInclude(pd => pd.Player)
                 .FirstOrDefault();
 
-            var playerToRemove = draft.AvailablePlayers.Where(p => p.Player.Rank == _rank);
+            var dDPlayer = new DraftDraftedPlayer();
+            var dPlayer = new DraftedPlayer();
 
-            appDbContext.Players.Remove(playerToRemove.FirstOrDefault().Player);
+            dPlayer.Name = player.Name;
+            dPlayer.Position = player.Position;
+            dPlayer.Rank = player.Rank;
+
+            dDPlayer.Draft = draft;
+            dDPlayer.Player = dPlayer;
+
+            //dPlayer.DraftDraftedPlayer = draft.PlayersDrafted;
+            draft.PlayersDrafted.Add(dDPlayer);
 
             appDbContext.SaveChanges();
+        }
+
+        [Route("api/[controller]/AddToTeam/{draftId}")]
+        [HttpPut]
+        public void AddPlayerToUserTeam([FromBody]Player player, int draftId)
+        {
+            TeamPlayer teamPlayer = new TeamPlayer();
+            var team = GetTeam(draftId);
+
+            player.Id = 0;
+            teamPlayer.Player = player;
+            teamPlayer.PlayerId = player.Id;
+            teamPlayer.Team = team;
+            teamPlayer.TeamId = team.Id;
+
+            var lineUp = appDbContext.Teams.Where(t => t == GetTeam(draftId)).FirstOrDefault().LineUp;
+
+            if (lineUp == null)
+            {
+                lineUp = new HashSet<TeamPlayer>();
+            }
+            lineUp.Add(teamPlayer);
+
+            appDbContext.SaveChanges();
+        }
+
+        [Route("api/[controller]/GetUserTeam/{draftId}")]
+        [HttpGet]
+        public IActionResult GetUserTeam(int draftId)
+        {
+            var team = GetTeam(draftId);
+
+            var roster = team.LineUp.Select(p => new Player { Id = p.PlayerId, Name = p.Player.Name, Position = p.Player.Position, Rank = p.Player.Rank}).ToList();
+
+            return Json(roster);
+        }
+
+        [Route("api/[controller]/GetNumberOfTeams/{draftId}")]
+        [HttpGet]
+        public int GetNumberOfTeams(int draftId)
+        {
+            return appDbContext.Drafts.Where(d => d.Id == draftId).Select(d => d.NumberOfTeams).FirstOrDefault();
+        }
+
+        [Route("api/[controller]/GetDraftPosition/{draftId}")]
+        [HttpGet]
+        public int GetDraftPosition(int draftId)
+        {
+            return appDbContext.Teams.Where(t => t.UserId == userManager.GetUserId(User) && t.DraftId == draftId).Select(t => t.DraftPosition).FirstOrDefault();
+        }
+
+        [Route("api/[controller]/GetDraftedPlayers/{draftId}")]
+        [HttpGet]
+        public IActionResult GetDraftedPlayers(int draftId)
+        {
+            var draft = appDbContext.Drafts.Where(d => d.Id == draftId)
+                .Include(d => d.PlayersDrafted)
+                .ThenInclude(dp => dp.Player)
+                .FirstOrDefault();
+
+            HashSet<Player> players = draft.PlayersDrafted
+                .Select(p => new Player { Id = p.Player.Id, Name = p.Player.Name, Rank = p.Player.Rank, Position = p.Player.Position })
+                .OrderBy(p => p.Rank).ToHashSet();
+
+            return Json(players);
+        }
+
+        private Team GetTeam(int draftId)
+        {
+            return appDbContext.Teams
+                .Where(t => t.UserId == userManager.GetUserId(User) && t.DraftId == draftId)
+                .Include(t => t.LineUp)
+                .ThenInclude(tp => tp.Player)
+                .FirstOrDefault();
         }
     }
 }
