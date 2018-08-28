@@ -136,16 +136,32 @@ namespace MyFirstWebsite.Controllers
         [HttpGet]
         public IActionResult GetDraftedPlayers(int draftId)
         {
-            var draft = appDbContext.Drafts.Where(d => d.Id == draftId)
-                .Include(d => d.PlayersDrafted)
-                .ThenInclude(dp => dp.Player)
-                .FirstOrDefault();
-
-            HashSet<Player> players = draft.PlayersDrafted
-                .Select(p => new Player { Id = p.Player.Id, Name = p.Player.Name, Rank = p.Player.Rank, Position = p.Player.Position })
-                .OrderBy(p => p.Rank).ToHashSet();
+            HashSet<DraftedPlayer> players = GetPlayersDrafted(draftId);
 
             return Json(players);
+        }
+
+        [Route("api/[controller]/GetDraftBoard/{draftId}")]
+        [HttpGet]
+        public IActionResult GetDraftBoard(int draftId)
+        {
+            HashSet<DraftedPlayer> players = GetPlayersDrafted(draftId);
+
+            return PartialView("_Card", players);
+        }
+
+        private HashSet<DraftedPlayer> GetPlayersDrafted(int draftId)
+        {
+            var draft = appDbContext.Drafts.Where(d => d.Id == draftId)
+                            .Include(d => d.PlayersDrafted)
+                            .ThenInclude(dp => dp.Player)
+                            .FirstOrDefault();
+
+            HashSet<DraftedPlayer> players = draft.PlayersDrafted
+                .Select(p => new DraftedPlayer { Id = p.Player.Id, Name = p.Player.Name, Rank = p.Player.Rank, Position = p.Player.Position })
+                .OrderBy(p => p.Rank).ToHashSet();
+
+            return players;
         }
 
         private Team GetTeam(int draftId)

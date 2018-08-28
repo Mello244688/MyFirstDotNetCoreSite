@@ -4,47 +4,60 @@
     <script src="~/content/fantasy.js"></script>
 }
 
-<div class="col-md-12 mb-3"><h3>@Model.LeagueName</h3></div>
-
-<div class="col-md-8">
-    <div class="input-group input-group-lg mb-3 justify-content-left" id="searchBar">
-        <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-search"></i></span>
-        </div>
-        <input class="form-control" type="text" placeholder="Search" id="searchInput">
+<div class="col-md-12 mb-3">
+    <div class="row">
+        <div class="col-md-9"><h3>@Model.LeagueName</h3></div>
+        <div class="col-md-3"><button class="btn btn-primary float-right" id="draftBoardButton">Draft Board</button></div>
     </div>
 </div>
 
-<div class="col-md-4">
-    <div class="row" id="roundPickGroup"></div>
+<div id="draftContent" class="col-md-12">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="input-group input-group-lg mb-3 justify-content-left" id="searchBar">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                </div>
+                <input class="form-control" type="text" placeholder="Search" id="searchInput">
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="row" id="roundPickGroup"></div>
+        </div>
+    </div>
+
+    <div class="row" id="draftInfoRow">
+        <div class="col-md-8">
+            <table class="table col-md-12" id="draftTable">
+                <thead>
+                    <tr>
+                        <th scope="col">Rank</th>
+                        <th scope="col">Player</th>
+                        <th scope="col">Position</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <table class="table col-md-4" id="teamTable">
+            <thead>
+                <tr><th>@Model.TeamName</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>QB</td></tr>
+                <tr><td>RB</td></tr>
+                <tr><td>RB</td></tr>
+                <tr><td>WR</td></tr>
+                <tr><td>WR</td></tr>
+                <tr><td>FLEX</td></tr>
+                <tr><td>TE</td></tr>
+                <tr><td>K</td></tr>
+                <tr><td>DEF</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<div class="col-md-12">
-    <table class="table col-md-12" id="draftTable">
-        <thead>
-            <tr>
-                <th scope="col">Rank</th>
-                <th scope="col">Player</th>
-                <th scope="col">Position</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
-
-<table class="table col-md-4" id="teamTable">
-    <thead>
-        <tr><th>@Model.TeamName</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>QB</td></tr>
-        <tr><td>RB</td></tr>
-        <tr><td>RB</td></tr>
-        <tr><td>WR</td></tr>
-        <tr><td>WR</td></tr>
-        <tr><td>FLEX</td></tr>
-        <tr><td>TE</td></tr>
-        <tr><td>K</td></tr>
-        <tr><td>DEF</td></tr>
-    </tbody>
-</table>
+<div class="col-md-12" id="draftBoard"></div>

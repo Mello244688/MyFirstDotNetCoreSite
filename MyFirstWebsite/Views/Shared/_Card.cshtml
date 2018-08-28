@@ -1,0 +1,18 @@
+﻿@model HashSet<DraftedPlayer>
+
+<div class="card-group">
+@for (int i = 0; i < Model.Count; i += 12)
+{
+    <div class="row col-md-12">
+        @for (int j = i; j < i + 12 && j < Model.Count; j++)
+        {
+            <div class="card col-md-1">
+                <div class="card-body">
+                    <h6 class="card-title">@Model.ElementAt(j).Name</h6>
+                    <p class="card-text">@Model.ElementAt(j).Position</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+</div>

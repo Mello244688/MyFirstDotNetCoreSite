@@ -6,8 +6,8 @@
 }
 
 .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 25px;
+    padding-right: 25px;
     padding-top: 15px;
 }
 
@@ -83,5 +83,13 @@ table {
 
 #round, #pick {
     text-align: center;
+}
+
+#draftContent, .card-body, #draftBoard, draftBoard.row {
+    padding: 0;
+}
+
+.card {
+    padding: 5px;
 }
 

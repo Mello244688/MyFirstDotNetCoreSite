@@ -8,63 +8,90 @@
     var pickCounter = 1;
     var round = 1;
 
-    $('#roundPickGroup').append('<div class="col-md-6"><h4 id="round">Round: ' + round + '</h4></div><div class="col-md-6"><h4 id="pick">Pick: ' + pickCounter + '</h4></div>');
+    setUpRoundAndPickLabels(round, pickCounter);
     updateRoundAndPickText();
     getNumberOfDraftTeams(idStr);
     getDraftPosition(idStr);
-
-    $.ajax({
-        url: '/api/FantasyApi/GetAvailablePlayers/' + idStr,
-        type: "GET",
-        data: {},
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (result) {
-            $.each(result, function (i, v) {
-                players.push({
-                    id: v.id,
-                    rank: v.rank,
-                    name: v.name,
-                    position: v.position
-                });
-                $('#draftTable tbody').append('<tr><th scope="row">' + v.rank + '</th>' +
-                    '<td>' + GetPlayerLink(v.name) + '</td>' + '<td>' + v.position + '</td>' +
-                    '<td><button class="btn btn-success">Draft</button></td>' + '</tr>');
-            });
-        },
-        error: function (result) {
-
-        }
-    });
-
+    getAvailablePlayers(idStr);
     getUserTeam(idStr);
     getDraftedPlayers(idStr);
     updateRoundAndPickText();
+    setUpEventListeners();
 
-    $(document).on('keyup', '#searchInput', function () {
-        searchBar();
-    });
+    function setUpEventListeners() {
 
-    $(document).on('click', '#draftTable button', function () {
-        var name = ($(this).closest('tr').children('td:first').text());
-        var tr = $(this).closest('tr');
-        var player;
-        tr.remove();
-
-        $.each(players, function (i, v) {
-            if (v.name == name) {
-                player = v;
-            }
+        $(document).on('keyup', '#searchInput', function () {
+            searchBar();
         });
 
-        removePlayer(idStr, player);
+        $(document).on('click', '#draftTable button', function () {
+            var name = ($(this).closest('tr').children('td:first').text());
+            var tr = $(this).closest('tr');
+            var player;
+            tr.remove();
 
-        updateRound();
-        updateRoundAndPickText();
+            $.each(players, function (i, v) {
+                if (v.name == name) {
+                    player = v;
+                }
+            });
 
-        $('#searchInput').val("");
-        searchBar();
-    });
+            removePlayer(idStr, player);
+
+            updateRound();
+            updateRoundAndPickText();
+
+            $('#searchInput').val("");
+            searchBar();
+        });
+
+        $(document).on('click', '#draftBoardButton', function () {
+
+            $.ajax({
+                url: '/api/FantasyApi/GetDraftBoard/' + idStr,
+                type: "GET",
+                //contentType: "application/json",
+                //dataType: "html",
+                success: function (result) {
+                    $('#draftContent').hide()
+                    $('#draftBoard').html(result);
+                },
+                error: function (result) {
+                    console.log(result);
+                }
+            });
+        });
+    }
+
+    function setUpRoundAndPickLabels(round, pickCounter) {
+        $('#roundPickGroup').append('<div class="col-md-6"><h4 id="round">Round: ' + round + '</h4></div><div class="col-md-6"><h4 id="pick">Pick: ' + pickCounter + '</h4></div>');
+    }
+
+    function getAvailablePlayers(draftId) {
+        $.ajax({
+            url: '/api/FantasyApi/GetAvailablePlayers/' + draftId,
+            type: "GET",
+            data: {},
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                $.each(result, function (i, v) {
+                    players.push({
+                        id: v.id,
+                        rank: v.rank,
+                        name: v.name,
+                        position: v.position
+                    });
+                    $('#draftTable tbody').append('<tr><th scope="row">' + v.rank + '</th>' +
+                        '<td>' + GetPlayerLink(v.name) + '</td>' + '<td>' + v.position + '</td>' +
+                        '<td><button class="btn btn-success">Draft</button></td>' + '</tr>');
+                });
+            },
+            error: function (result) {
+
+            }
+        });
+    }
 
     function formatName(pname) {
         var first = pname.indexOf(' ');
@@ -253,6 +280,6 @@
         console.log('odd');
         console.log((r - 1) * numPlayers + draftPick);
         return ((r - 1) * numPlayers + draftPick) == numPicks;
-        
+
     }
 });
