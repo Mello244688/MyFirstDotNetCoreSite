@@ -6,8 +6,8 @@
 }
 
 .body-content {
-    padding-left: 25px;
-    padding-right: 25px;
+    padding-left: 35px;
+    padding-right: 35px;
     padding-top: 15px;
 }
 
@@ -92,4 +92,67 @@ table {
 .card {
     padding: 5px;
 }
+
+#draftBoard div.row {
+    margin: 0 !important;
+}
+
+.bottom-right {
+    right: 0;
+    bottom: 0;
+    position: absolute;
+}
+
+/*#draftButton, #draftBoardButton {
+    width: 55%;
+}*/
+
+.btn-group div {
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+.btn-transparent {
+    background-color: Transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+}
+
+.fa-times {
+    color: red;
+}
+
+#listOfTeamsTable th:nth-child(2) {
+    text-align:center;
+}
+
+@media only screen and (max-width: 800px) {
+    #draftBoardButton {
+        display: none !important;
+    }
+}
+
+.edit-effect {
+    cursor: pointer;
+}
+
+.edit-effect:hover {
+    border-color: red;
+    -webkit-box-shadow: 0 0 10px red;
+    -moz-box-shadow: 0 0 10px red;
+    box-shadow: 0 0 10px red;
+}
+
+.card-selected {
+    border-color: red;
+    -webkit-box-shadow: 0 0 10px red;
+    -moz-box-shadow: 0 0 10px red;
+    box-shadow: 0 0 10px red;
+    background-color: gray !important;
+}
+
+
 

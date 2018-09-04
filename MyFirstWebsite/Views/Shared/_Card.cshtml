@@ -1,18 +1,60 @@
-﻿@model HashSet<DraftedPlayer>
+﻿@model DraftboardViewModel
 
-<div class="card-group">
-@for (int i = 0; i < Model.Count; i += 12)
+
+@for (int i = 0, row = 0; i < Model.Players.Count; i += Model.NumberOfTeams, row++)
 {
-    <div class="row col-md-12">
-        @for (int j = i; j < i + 12 && j < Model.Count; j++)
+    var k = i + Model.NumberOfTeams - 1;
+<div class="row col-md-12">
+    @for (int j = i; j < i + Model.NumberOfTeams && j < Model.Players.Count; j++, k--)
+    {
+        @if (row % 2 == 1)
+        {
+            @if (k >= Model.Players.Count)
+            {
+                k = Model.Players.Count - 1;
+            }
+            @if (Model.Players.ElementAt(k).PositionDrafted == Model.Players.Count)
+            {
+                <div class="card col-md-1 ml-auto">
+                    <div class="card-body">
+                        <h6 class="card-title">@Model.Players.ElementAt(k).Name</h6>
+                        <footer>
+                            <small class="text-muted bottom-right">
+                                @Model.Players.ElementAt(k).Position
+                            </small>
+                        </footer>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card col-md-1">
+                    <div class="card-body">
+                        <h6 class="card-title">@Model.Players.ElementAt(k).Name</h6>
+                        <footer>
+                            <small class="text-muted bottom-right">
+                                @Model.Players.ElementAt(k).Position
+                            </small>
+                        </footer>
+                    </div>
+                </div>
+
+            }
+        }
+        else
         {
             <div class="card col-md-1">
                 <div class="card-body">
-                    <h6 class="card-title">@Model.ElementAt(j).Name</h6>
-                    <p class="card-text">@Model.ElementAt(j).Position</p>
+                    <h6 class="card-title">@Model.Players.ElementAt(j).Name</h6>
+                    <footer>
+                        <small class="text-muted bottom-right">
+                            @Model.Players.ElementAt(j).Position
+                        </small>
+                    </footer>
                 </div>
             </div>
         }
-    </div>
-}
+    }
 </div>
+}
+

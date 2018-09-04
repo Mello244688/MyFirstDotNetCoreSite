@@ -1,17 +1,22 @@
 ﻿@model IEnumerable<Team>
 
-<table class="table">
+@section Scripts{ 
+    <script src="~/content/teamsList.js"></script>
+}
+<table class="table" id="listOfTeamsTable">
     <thead>
         <tr>
-            <th>My Teams</th>
+            <th>My Drafts</th>
+            <th align="center"><a asp-controller="Fantasy" asp-action="New">New Draft</a></th>
         </tr>
     </thead>
 
     @foreach (var team in Model)
     {
         <tbody>
-            <tr>
-                <td><a asp-controller="Fantasy" asp-action="Draft" asp-route-id="@team.DraftId">League: @team.LeagueName Team: @team.TeamName</a></td>
+            <tr data-team-name="@team.TeamName" data-league-name="@team.LeagueName">
+                <td class="ml-auto"><a asp-controller="Fantasy" asp-action="Draft" asp-route-id="@team.DraftId">League: @team.LeagueName Team: @team.TeamName</a></td>
+                <td align="center"><button class="fa fa-times btn-transparent"></button></td>
             </tr>
         </tbody>
     }

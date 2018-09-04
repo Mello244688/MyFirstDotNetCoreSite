@@ -8,6 +8,7 @@
     var pickCounter = 1;
     var round = 1;
 
+    hideDraftBoard();
     setUpRoundAndPickLabels(round, pickCounter);
     updateRoundAndPickText();
     getNumberOfDraftTeams(idStr);
@@ -53,13 +54,23 @@
                 //contentType: "application/json",
                 //dataType: "html",
                 success: function (result) {
-                    $('#draftContent').hide()
+                    hideDraft();
                     $('#draftBoard').html(result);
+                    setupDraftBoardColors();
                 },
                 error: function (result) {
                     console.log(result);
                 }
             });
+        });
+
+        $(document).on('click', '#draftButton', function () {
+            hideDraftBoard();
+           
+        });
+
+        $(document).on('click', '#editDraftButton', function () {
+            editDraft();
         });
     }
 
@@ -227,6 +238,9 @@
     }
 
     function addPlayerToDrafted(draftId, player) {
+
+        player.positionDrafted = pickCounter;
+
         $.ajax({
             url: '/api/FantasyApi/AddToDrafted/' + draftId,
             type: 'PUT',
@@ -282,4 +296,83 @@
         return ((r - 1) * numPlayers + draftPick) == numPicks;
 
     }
+
+    function hideDraftBoard() {
+        $('#draftBoard').hide();
+        $('#draftButton').parent().parent().hide();
+        $('#draftContent').show();
+        $('#draftBoardButton').show();
+        $('#draftbutton').parent().parent().removeClass('col-md-3');
+        $('#draftBoardButton').parent().addClass('col-md-3');
+    }
+
+    function hideDraft() {
+        $('#draftContent').hide();
+        $('#draftButton').parent().parent().show();
+        $('#draftBoardButton').hide();
+        $('#draftBoard').show();
+        $('#draftBoardButton').parent().removeClass('col-md-3');
+        $('#draftbutton').parent().parent().addClass('col-md-3');  
+    }
+
+    function setupDraftBoardColors() {
+        $.each($('.card-body footer'), function () {
+            if ($(this).text().trim().startsWith('QB')) {
+                $(this).parent().parent().css('background-color', '#ff3333');
+            }
+            else if ($(this).text().trim().startsWith('WR')) {
+                $(this).parent().parent().css('background-color', '#8080ff');
+            }
+            else if ($(this).text().trim().startsWith('RB')) {
+                $(this).parent().parent().css('background-color', '#33ff33');
+            }
+            else if ($(this).text().trim().startsWith('D')) {
+                $(this).parent().parent().css('background-color', '#ffd700');
+            }
+            else if ($(this).text().trim().startsWith('TE')) {
+                $(this).parent().parent().css('background-color', '#b84dff');
+            }
+            else if ($(this).text().trim().startsWith('K')) {
+                $(this).parent().parent().css('background-color', '#00FFFF');
+            }
+
+        });
+    }
+
+    function editDraft() {
+        var editButton = $('#editDraftButton');
+        var draftButton = $('#draftButton');
+
+        if (draftButton.prop('disabled')) {
+            editButton.removeClass('btn-danger active').addClass('btn-primary');
+            draftButton.removeClass('btn-secondary disabled').addClass('btn-primary').prop('disabled', false);
+            $('.card').removeClass('edit-effect');
+            removeCardClickEvent();
+        } else {
+            editButton.removeClass('btn-primary').addClass('btn-danger active');
+            draftButton.removeClass('btn-primary').addClass('disabled btn-secondary').prop('disabled', true);
+            $('.card').addClass('edit-effect');
+            setupCardClickEvent();
+        }
+    }
+
+    function setupCardClickEvent() {
+        $(document).on('click', '.card', function () {
+            if ($(this).hasClass('card-selected')) {
+                $(this).removeClass('card-selected');
+            }
+            else
+            {
+                $(this).addClass('card-selected');
+            }
+            
+        });
+    }
+
+    function removeCardClickEvent() {
+        $(document).off('click', '.card');
+        $('.card').removeClass('card-selected');
+    }
+
+
 });

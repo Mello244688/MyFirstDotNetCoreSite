@@ -55,7 +55,8 @@ namespace MyFirstWebsite.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Rank = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    Position = table.Column<string>(nullable: true)
+                    Position = table.Column<string>(nullable: true),
+                    positionDrafted = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -279,18 +280,11 @@ namespace MyFirstWebsite.Migrations
                 columns: table => new
                 {
                     TeamId = table.Column<int>(nullable: false),
-                    PlayerId = table.Column<int>(nullable: false),
-                    DraftedPlayerId = table.Column<int>(nullable: true)
+                    PlayerId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TeamPlayer", x => new { x.TeamId, x.PlayerId });
-                    table.ForeignKey(
-                        name: "FK_TeamPlayer_DraftedPlayer_DraftedPlayerId",
-                        column: x => x.DraftedPlayerId,
-                        principalTable: "DraftedPlayer",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TeamPlayer_Players_PlayerId",
                         column: x => x.PlayerId,
@@ -353,11 +347,6 @@ namespace MyFirstWebsite.Migrations
                 name: "IX_DraftPlayer_PlayerId",
                 table: "DraftPlayer",
                 column: "PlayerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TeamPlayer_DraftedPlayerId",
-                table: "TeamPlayer",
-                column: "DraftedPlayerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TeamPlayer_PlayerId",

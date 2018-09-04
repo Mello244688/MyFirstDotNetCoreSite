@@ -11,6 +11,7 @@ namespace MyFirstWebsite.Models
         public int Rank { get; set; }
         public string Name { get; set; }
         public string Position { get; set; }
+        public int PositionDrafted { get; set; }
 
         public ICollection<DraftDraftedPlayer> DraftDraftedPlayer { get; set; }
         //public ICollection<TeamPlayer> TeamPlayer { get; set; }

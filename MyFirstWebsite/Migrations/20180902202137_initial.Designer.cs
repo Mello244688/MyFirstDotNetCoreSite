@@ -10,7 +10,7 @@ using MyFirstWebsite.Models;
 namespace MyFirstWebsite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20180826170944_initial")]
+    [Migration("20180902202137_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -226,6 +226,8 @@ namespace MyFirstWebsite.Migrations
 
                     b.Property<int>("Rank");
 
+                    b.Property<int>("positionDrafted");
+
                     b.HasKey("Id");
 
                     b.ToTable("DraftedPlayer");
@@ -293,11 +295,7 @@ namespace MyFirstWebsite.Migrations
 
                     b.Property<int>("PlayerId");
 
-                    b.Property<int?>("DraftedPlayerId");
-
                     b.HasKey("TeamId", "PlayerId");
-
-                    b.HasIndex("DraftedPlayerId");
 
                     b.HasIndex("PlayerId");
 
@@ -390,10 +388,6 @@ namespace MyFirstWebsite.Migrations
 
             modelBuilder.Entity("MyFirstWebsite.Models.TeamPlayer", b =>
                 {
-                    b.HasOne("MyFirstWebsite.Models.DraftedPlayer")
-                        .WithMany("TeamPlayer")
-                        .HasForeignKey("DraftedPlayerId");
-
                     b.HasOne("MyFirstWebsite.Models.Player", "Player")
                         .WithMany("TeamPlayer")
                         .HasForeignKey("PlayerId")

@@ -60,7 +60,7 @@ namespace MyFirstWebsite.Controllers
 
         [Route("api/[controller]/AddToDrafted/{draftId}")]
         [HttpPut]
-        public void AddPlayerToDrafted([FromBody]Player player, int draftId)
+        public void AddPlayerToDrafted([FromBody]DraftedPlayer player, int draftId)
         {
             var draft = appDbContext.Drafts.Where(d => d.Id == draftId)
                 .Include(d => d.PlayersDrafted)
@@ -73,11 +73,11 @@ namespace MyFirstWebsite.Controllers
             dPlayer.Name = player.Name;
             dPlayer.Position = player.Position;
             dPlayer.Rank = player.Rank;
+            dPlayer.PositionDrafted = player.PositionDrafted;
 
             dDPlayer.Draft = draft;
             dDPlayer.Player = dPlayer;
 
-            //dPlayer.DraftDraftedPlayer = draft.PlayersDrafted;
             draft.PlayersDrafted.Add(dDPlayer);
 
             appDbContext.SaveChanges();
@@ -145,10 +145,33 @@ namespace MyFirstWebsite.Controllers
         [HttpGet]
         public IActionResult GetDraftBoard(int draftId)
         {
-            HashSet<DraftedPlayer> players = GetPlayersDrafted(draftId);
+            DraftboardViewModel draftboardViewModel = new DraftboardViewModel();
+            var draft = appDbContext.Drafts.Where(d => d.Id == draftId).FirstOrDefault();
 
-            return PartialView("_Card", players);
+            draftboardViewModel.Players = GetPlayersDrafted(draftId);
+            draftboardViewModel.NumberOfTeams = draft.NumberOfTeams;
+
+            return PartialView("_Card", draftboardViewModel);
         }
+
+        [Route("api/[controller]/DeleteTeam/")]
+        [HttpDelete]
+        public void DeleteTeam([FromBody] Team team)
+        {
+            appDbContext.Teams.Remove(team);
+
+            appDbContext.SaveChanges();
+        }
+
+        [Route("api/[controller]/GetAllUserTeams/")]
+        [HttpGet]
+        public IActionResult GetAllUserTeams()
+        {
+            var teams = appDbContext.ApplicationUsers.Where(u => u.Id == userManager.GetUserId(User)).Select(u => u.UserTeams).FirstOrDefault().ToList();
+
+            return Json(teams);
+        }
+
 
         private HashSet<DraftedPlayer> GetPlayersDrafted(int draftId)
         {
@@ -158,8 +181,8 @@ namespace MyFirstWebsite.Controllers
                             .FirstOrDefault();
 
             HashSet<DraftedPlayer> players = draft.PlayersDrafted
-                .Select(p => new DraftedPlayer { Id = p.Player.Id, Name = p.Player.Name, Rank = p.Player.Rank, Position = p.Player.Position })
-                .OrderBy(p => p.Rank).ToHashSet();
+                .Select(p => new DraftedPlayer { Id = p.Player.Id, Name = p.Player.Name, Rank = p.Player.Rank, Position = p.Player.Position, PositionDrafted = p.Player.PositionDrafted })
+                .OrderBy(p => p.PositionDrafted).ToHashSet();
 
             return players;
         }
