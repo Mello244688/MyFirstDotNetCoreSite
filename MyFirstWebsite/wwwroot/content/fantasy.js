@@ -3,21 +3,22 @@
     var url = window.location.pathname;
     var idStr = url.substring(url.lastIndexOf('/') + 1);
     var players = [];
+    var draftedPlayers = [];
+    var playersEdited = [];
     var numPlayers;
     var draftPosition;
     var pickCounter = 1;
     var round = 1;
 
+    setUpEventListeners();
     hideDraftBoard();
     setUpRoundAndPickLabels(round, pickCounter);
     updateRoundAndPickText();
     getNumberOfDraftTeams(idStr);
     getDraftPosition(idStr);
     getAvailablePlayers(idStr);
-    getUserTeam(idStr);
     getDraftedPlayers(idStr);
-    updateRoundAndPickText();
-    setUpEventListeners();
+    getUserTeam(idStr);
 
     function setUpEventListeners() {
 
@@ -59,7 +60,6 @@
                     setupDraftBoardColors();
                 },
                 error: function (result) {
-                    console.log(result);
                 }
             });
         });
@@ -161,7 +161,7 @@
                     });
 
                     if (tableRow.length == 0 && player.length == 0) {
-                        if (flexPosition.children().length == 1 && (position == 'QB' || position == 'RB' || position == 'TE')) {
+                        if (flexPosition.children().length == 1 && (position == 'WR' || position == 'RB' || position == 'TE')) {
                             flexPosition.first().append('<td>' + GetPlayerLink(v.name) + '</td>');
                         } else {
                             $('#teamTable tbody').append('<tr><td>BN</td><td>' + GetPlayerLink(v.name) + '</td></tr>');
@@ -171,6 +171,8 @@
                         tableRow.first().append('<td>' + GetPlayerLink(v.name) + '</td>');
                     }
                 });
+                console.log('user team :');
+                console.log(result);
             }
         });
     }
@@ -205,20 +207,6 @@
         }).responseJSON;
     }
 
-    function addPlayerToTeam(draftId, player) {
-        $.ajax({
-            url: '/api/FantasyApi/AddToTeam/' + draftId,
-            type: 'PUT',
-            data: JSON.stringify(player),
-            contentType: "application/json; charset=utf-8",
-            processData: true,
-            cache: false,
-            success: function (result) {
-                getUserTeam(draftId);
-            }
-        });
-    }
-
     function getDraftedPlayers(draftId) {
         $.ajax({
             url: '/api/FantasyApi/GetDraftedPlayers/' + draftId,
@@ -228,8 +216,17 @@
             dataType: "json",
             success: function (result) {
                 pickCounter = result.length + 1;
-                console.log('test: ' + pickCounter);
                 updateRoundAndPickText();
+
+                $.each(result, function (i, v) {
+                    draftedPlayers.push({
+                        id: v.id,
+                        rank: v.rank,
+                        name: v.name,
+                        position: v.position,
+                        positionDrafted: v.positionDrafted
+                    });
+                });
             },
             error: function (result) {
 
@@ -252,6 +249,8 @@
                 if (isTurn(round, numPlayers, draftPosition, pickCounter)) {
                     addPlayerToTeam(idStr, player);
                 }
+                playersDrafted = [];
+                getDraftedPlayers(idStr);
                 pickCounter++;
                 updateRoundAndPickText();
             }
@@ -285,14 +284,10 @@
     }
 
     function isTurn(r, numPlayers, draftPick, numPicks) {
-        console.log("r: " + r + "numPicks: " + numPlayers + "draftPick: " + draftPick)
         if (r % 2 == 0) {
-            console.log('even');
-            console.log(r * numPlayers - draftPick + 1)
+
             return (r * numPlayers - draftPick + 1) == numPicks;
         }
-        console.log('odd');
-        console.log((r - 1) * numPlayers + draftPick);
         return ((r - 1) * numPlayers + draftPick) == numPicks;
 
     }
@@ -346,11 +341,14 @@
         if (draftButton.prop('disabled')) {
             editButton.removeClass('btn-danger active').addClass('btn-primary');
             draftButton.removeClass('btn-secondary disabled').addClass('btn-primary').prop('disabled', false);
+            editButton.text('Edit');
             $('.card').removeClass('edit-effect');
             removeCardClickEvent();
+            swapDraftedPlayers(playersEdited, idStr);
         } else {
             editButton.removeClass('btn-primary').addClass('btn-danger active');
             draftButton.removeClass('btn-primary').addClass('disabled btn-secondary').prop('disabled', true);
+            editButton.text('Save');
             $('.card').addClass('edit-effect');
             setupCardClickEvent();
         }
@@ -365,6 +363,10 @@
             {
                 $(this).addClass('card-selected');
             }
+
+            if ($('.card-selected').length > 1) {
+                swapCards();
+            }
             
         });
     }
@@ -372,6 +374,84 @@
     function removeCardClickEvent() {
         $(document).off('click', '.card');
         $('.card').removeClass('card-selected');
+    }
+
+    function swapCards() {
+
+        if ($('.card-selected').length > 1) {
+            var card1 = $('.card-selected').eq(0);
+            var card2 = $('.card-selected').eq(1);
+
+            var card1NameElement = card1.children().children().get(0);
+            var card1PositionElement = card1.children().children().eq(1).children().get(0);
+            var card2NameElement = card2.children().children().get(0);
+            var card2PositionElement = card2.children().children().eq(1).children().get(0);
+
+            var name1 = card1NameElement.innerText.trim();
+            var name2 = card2NameElement.innerText.trim();
+            var position1 = card1PositionElement.innerText.trim();
+            var position2 = card2PositionElement.innerText.trim();
+
+            card1NameElement.innerText = name2;
+            card1PositionElement.innerText = position2;
+            card2NameElement.innerText = name1;
+            card2PositionElement.innerText = position1;
+
+            setupDraftBoardColors();
+            $('.card').removeClass('card-selected');
+
+            var indexesToRemove = [];
+
+            $.each(playersEdited, function (i, v) {
+     
+                if (v.name.includes(name1) || v.name.includes(name2)) {
+                    indexesToRemove.push(i);
+                }
+            });
+
+            for (var i = indexesToRemove.length - 1; i >= 0; i--) {
+                playersEdited.splice(indexesToRemove[i], 1);
+            }
+
+            var player1;
+            var player2;
+
+            $.each(draftedPlayers, function (i, v) {
+                if (v.name.includes(name1)) {
+                    console.log(v);
+                    player1 = v;
+                }
+                else if (v.name.includes(name2)) {
+                    console.log(v);
+                    player2 = v;
+                }
+            });
+            console.log(draftedPlayers);
+            var temp = player1.positionDrafted
+            player1.positionDrafted = player2.positionDrafted;
+            player2.positionDrafted = temp;
+
+            playersEdited.push(player1);
+            playersEdited.push(player2);
+        }
+    }
+
+    function swapDraftedPlayers(players, draftId) {
+        
+        $.ajax({
+            url: '/api/FantasyApi/SwapDraftedPlayers/' + draftId,
+            type: 'PUT',
+            data: JSON.stringify(players),
+            contentType: "application/json; charset=utf-8",
+            processData: true,
+            cache: false,
+            success: function (result) {
+                getUserTeam(idStr);
+                $('#teamTable tbody tr').children('td:nth-child(2)').remove();
+                $('#teamTable tbody tr').children('td:nth-child(2)')
+                playersEdited = [];
+            }
+        });
     }
 
 

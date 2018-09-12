@@ -113,9 +113,10 @@ namespace MyFirstWebsite.Controllers
         {
             var team = GetTeam(draftId);
 
-            var roster = team.LineUp.Select(p => new Player { Id = p.PlayerId, Name = p.Player.Name, Position = p.Player.Position, Rank = p.Player.Rank}).ToList();
+            //var roster = team.LineUp.Select(p => new Player { Id = p.PlayerId, Name = p.Player.Name, Position = p.Player.Position, Rank = p.Player.Rank}).ToList();
+            var draft = appDbContext.Drafts.Where(d => d.Id == draftId).Include(d => d.PlayersDrafted).ThenInclude(pd => pd.Player).FirstOrDefault();
 
-            return Json(roster);
+            return Json(GetUserPlayers(draftId, team.Draft.NumberOfTeams, draft.PlayersDrafted.Select(p => p.Player).OrderBy(p => p.PositionDrafted).ToList()));
         }
 
         [Route("api/[controller]/GetNumberOfTeams/{draftId}")]
@@ -172,6 +173,118 @@ namespace MyFirstWebsite.Controllers
             return Json(teams);
         }
 
+        [Route("api/[controller]/SwapDraftedPlayers/{draftId}")]
+        [HttpPut]
+        public void SwapDraftedPlayers([FromBody] List<DraftedPlayer> draftedPlayers, int draftId)
+        {
+            var draft = appDbContext.Drafts.Where(d => d.Id == draftId).Include(d => d.PlayersDrafted).ThenInclude(pd => pd.Player).FirstOrDefault();
+
+            foreach (var player in draftedPlayers)
+            {
+                draft.PlayersDrafted.Where(p => p.PlayerId == player.Id).FirstOrDefault().Player.PositionDrafted = player.PositionDrafted;
+            }
+
+            //UpdateUserTeam(draftId, draft.NumberOfTeams, draft.PlayersDrafted.Select(p => p.Player).OrderBy(p => p.PositionDrafted).ToList());
+
+            appDbContext.SaveChanges();
+                
+        }
+
+        private void UpdateUserTeam(int draftId, int numTeams, List<DraftedPlayer> playersDrafted)
+        {
+            var team = appDbContext.Teams.Where(t => t == GetTeam(draftId)).FirstOrDefault();
+            var players = new List<Player>();
+            List<TeamPlayer> lineup = new List<TeamPlayer>();
+
+            for (int i = 0; i < playersDrafted.Count; i++)
+            {
+                decimal r = (i + numTeams) / numTeams;
+                var round = Math.Floor(r);
+                if (round % 2 == 0)
+                {
+                    if (r * numTeams - team.DraftPosition + 1 == i + 1)
+                    {
+                        //AddTeamPlayerToLineup(playersDrafted, team, lineup, i);
+                    }
+                }
+                else
+                {
+                    if ((r - 1) * numTeams + team.DraftPosition == i + 1)
+                    {
+                        //AddTeamPlayerToLineup(playersDrafted, team, lineup, i);
+                    }
+                }
+            }
+
+            team.LineUp = lineup;
+            appDbContext.SaveChanges();
+        }
+
+        private void AddTeamPlayerToLineup(List<DraftedPlayer> playersDrafted, Team team, List<TeamPlayer> lineup, int i)
+        {
+            lineup.Add(new TeamPlayer
+            {
+                Player = /*appDbContext.Players.Where(p => p.Id == playersDrafted.ElementAt(i).Id).Include(p => p.DraftPlayer).Include(p => p.TeamPlayer).FirstOrDefault()*/new Player
+                {
+                    //Id = playersDrafted.ElementAt(i).Id,
+                    Name = playersDrafted.ElementAt(i).Name,
+                    Position = playersDrafted.ElementAt(i).Position,
+                    Rank = playersDrafted.ElementAt(i).Rank 
+                },
+                PlayerId = playersDrafted.ElementAt(i).Id,
+                Team = new Team
+                {
+                    Draft = team.Draft,
+                    DraftId = team.DraftId,
+                    DraftPosition = team.DraftPosition,
+                    Id = team.Id,
+                    LeagueName = team.LeagueName,
+                    TeamName = team.TeamName,
+                    User = team.User,
+                    UserId = team.UserId,
+                    LineUp = lineup
+                },
+                TeamId = team.Id
+            });
+        }
+
+        private Player GetNewPlayer(List<DraftedPlayer> playersDrafted, int i)
+        {
+            return new Player
+            {
+                Id = playersDrafted.ElementAt(i).Id,
+                Name = playersDrafted.ElementAt(i).Name,
+                Position = playersDrafted.ElementAt(i).Position,
+                Rank = playersDrafted.ElementAt(i).Rank
+            };
+        }
+
+        private List<Player> GetUserPlayers(int draftId, int numTeams, List<DraftedPlayer> playersDrafted)
+        {
+            var team = appDbContext.Teams.Where(t => t == GetTeam(draftId)).FirstOrDefault();
+            List<Player> players = new List<Player>();
+
+            for (int i = 0; i < playersDrafted.Count; i++)
+            {
+                decimal r = (i + numTeams) / numTeams;
+                var round = Math.Floor(r);
+                if (round % 2 == 0)
+                {
+                    if (r * numTeams - team.DraftPosition + 1 == i + 1)
+                    {
+                        players.Add(GetNewPlayer(playersDrafted, i));
+                    }
+                }
+                else
+                {
+                    if ((r - 1) * numTeams + team.DraftPosition == i + 1)
+                    {
+                        players.Add(GetNewPlayer(playersDrafted, i));
+                    }
+                }
+            }
+            return players;
+        }
 
         private HashSet<DraftedPlayer> GetPlayersDrafted(int draftId)
         {
