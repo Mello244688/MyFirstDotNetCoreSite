@@ -72,6 +72,10 @@
         $(document).on('click', '#editDraftButton', function () {
             editDraft();
         });
+
+        $(document).on('click', '#hideShowTeamButton', function () {
+            hideShowTeam();
+        })
     }
 
     function setUpRoundAndPickLabels(round, pickCounter) {
@@ -296,7 +300,7 @@
         $('#draftBoard').hide();
         $('#draftButton').parent().parent().hide();
         $('#draftContent').show();
-        $('#draftBoardButton').show();
+        $('#draftBoardButton').parent().parent().show();
         $('#draftbutton').parent().parent().removeClass('col-md-3');
         $('#draftBoardButton').parent().addClass('col-md-3');
     }
@@ -304,7 +308,7 @@
     function hideDraft() {
         $('#draftContent').hide();
         $('#draftButton').parent().parent().show();
-        $('#draftBoardButton').hide();
+        $('#draftBoardButton').parent().parent().hide();
         $('#draftBoard').show();
         $('#draftBoardButton').parent().removeClass('col-md-3');
         $('#draftbutton').parent().parent().addClass('col-md-3');  
@@ -452,6 +456,20 @@
                 playersEdited = [];
             }
         });
+    }
+
+    function hideShowTeam() {
+        if ($('#teamTable').is(':visible')) {
+            $('#teamTable').hide();
+            $('#draftTable').parent().removeClass('col-md-8').addClass('col-md-12');
+            $('#hideShowTeamButton').text('Show Team');
+        }
+        else {
+            console.log('hit');
+            $('#draftTable').parent().removeClass('col-md-12').addClass('col-md-8');
+            $('#teamTable').show();
+            $('#hideShowTeamButton').text('Hide Team');
+        }
     }
 
 
