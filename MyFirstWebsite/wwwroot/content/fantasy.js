@@ -23,7 +23,8 @@
     function setUpEventListeners() {
 
         $(document).on('keyup', '#searchInput', function () {
-            searchBar();
+            //searchBar();
+            filterPlayerAndPosition($('#filterPositions option:selected').text());
         });
 
         $(document).on('click', '#draftTable button', function () {
@@ -75,6 +76,10 @@
 
         $(document).on('click', '#hideShowTeamButton', function () {
             hideShowTeam();
+        })
+
+        $(document).on('change', '#filterPositions', function () {
+            filterPlayerAndPosition($(this).children('option:selected').text());
         })
     }
 
@@ -129,6 +134,32 @@
             td = tr[i].getElementsByTagName("td")[0];
             if (td) {
                 if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function filterPlayerAndPosition(position) {
+        var filter, table, tr, td, i, input;
+        
+        if ($('#filterPositions option:selected').val() == 0) {
+            position = "";
+        }
+
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("draftTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            nameTd = tr[i].getElementsByTagName("td")[0];
+            positionTd = tr[i].getElementsByTagName("td")[1];
+            if (nameTd || positionTd) {
+                if (positionTd.innerHTML.toUpperCase().includes(position) && nameTd.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    console.log(filter + " " + position);
                     tr[i].style.display = "";
                 } else {
                     tr[i].style.display = "none";
