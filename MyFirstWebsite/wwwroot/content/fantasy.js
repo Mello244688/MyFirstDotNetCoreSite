@@ -12,11 +12,11 @@
 
     setUpEventListeners();
     hideDraftBoard();
+    getAvailablePlayers(idStr);
     setUpRoundAndPickLabels(round, pickCounter);
     updateRoundAndPickText();
     getNumberOfDraftTeams(idStr);
     getDraftPosition(idStr);
-    getAvailablePlayers(idStr);
     getDraftedPlayers(idStr);
     getUserTeam(idStr);
 
@@ -27,7 +27,7 @@
             filterPlayerAndPosition($('#filterPositions option:selected').text());
         });
 
-        $(document).on('click', '#draftTable button', function () {
+        $(document).on('click', '#draftButton', function () {
             var name = ($(this).closest('tr').children('td:first').text());
             var tr = $(this).closest('tr');
             var player;
@@ -45,7 +45,7 @@
             updateRoundAndPickText();
 
             $('#searchInput').val("");
-            searchBar();
+            filterPlayerAndPosition();
         });
 
         $(document).on('click', '#draftBoardButton', function () {
@@ -81,6 +81,19 @@
         $(document).on('change', '#filterPositions', function () {
             filterPlayerAndPosition($(this).children('option:selected').text());
         })
+
+        $(document).on('click', '#addPlayer', function () {
+            addPlayerForm();
+        });
+
+        $(document).on('submit', '#addPlayerForm', function (e) {
+            e.preventDefault();
+            addPlayer(idStr);
+        });
+
+        $(document).on('click', '#closeFormButton', function () {
+            closeForm();
+        });
     }
 
     function setUpRoundAndPickLabels(round, pickCounter) {
@@ -104,8 +117,9 @@
                     });
                     $('#draftTable tbody').append('<tr><th scope="row">' + v.rank + '</th>' +
                         '<td>' + GetPlayerLink(v.name) + '</td>' + '<td>' + v.position + '</td>' +
-                        '<td><button class="btn btn-success">Draft</button></td>' + '</tr>');
+                        '<td><button id="draftButton" class="btn btn-success">Draft</button></td>' + '</tr>');
                 });
+                $('#draftTable tbody').append('<tr><td><button class="btn btn-link" id="addPlayer">Add Player</button><td/td></tr>');
             },
             error: function (result) {
 
@@ -119,27 +133,6 @@
         var newName = pname.substring(0, first) + "-" + pname.substring(first + 1, second);
 
         return newName.trim().toLowerCase().replace(/'/, '');
-    }
-
-    function searchBar() {
-
-        var input, filter, table, tr, td, i;
-
-        input = document.getElementById("searchInput");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("draftTable");
-        tr = table.getElementsByTagName("tr");
-
-        for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0];
-            if (td) {
-                if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-        }
     }
 
     function filterPlayerAndPosition(position) {
@@ -159,10 +152,12 @@
             positionTd = tr[i].getElementsByTagName("td")[1];
             if (nameTd || positionTd) {
                 if (positionTd.innerHTML.toUpperCase().includes(position) && nameTd.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                    console.log(filter + " " + position);
                     tr[i].style.display = "";
                 } else {
-                    tr[i].style.display = "none";
+                    if (!tr[i].innerHTML.includes("Add Player")) {
+                        tr[i].style.display = "none";
+                    }
+                    
                 }
             }
         }
@@ -206,8 +201,6 @@
                         tableRow.first().append('<td>' + GetPlayerLink(v.name) + '</td>');
                     }
                 });
-                console.log('user team :');
-                console.log(result);
             }
         });
     }
@@ -281,9 +274,9 @@
             processData: true,
             cache: false,
             success: function (result) {
-                if (isTurn(round, numPlayers, draftPosition, pickCounter)) {
-                    addPlayerToTeam(idStr, player);
-                }
+                //if (isTurn(round, numPlayers, draftPosition, pickCounter)) {
+                //    addPlayerToTeam(idStr, player);
+                //}
                 playersDrafted = [];
                 getDraftedPlayers(idStr);
                 pickCounter++;
@@ -453,15 +446,12 @@
 
             $.each(draftedPlayers, function (i, v) {
                 if (v.name.includes(name1)) {
-                    console.log(v);
                     player1 = v;
                 }
                 else if (v.name.includes(name2)) {
-                    console.log(v);
                     player2 = v;
                 }
             });
-            console.log(draftedPlayers);
             var temp = player1.positionDrafted
             player1.positionDrafted = player2.positionDrafted;
             player2.positionDrafted = temp;
@@ -496,12 +486,67 @@
             $('#hideShowTeamButton').text('Show Team');
         }
         else {
-            console.log('hit');
             $('#draftTable').parent().removeClass('col-md-12').addClass('col-md-8');
             $('#teamTable').show();
             $('#hideShowTeamButton').text('Hide Team');
         }
     }
 
+    function addPlayerForm() {
+        $('body').append('<div class="popup-form row col-md-6 justify-content-center align-items-center" id="addPlayerFormContainer"></div>')
+        $.ajax({
+            url: '/api/FantasyApi/GetAddPlayerForm/',
+            type: 'GET',
+            success: function (result) {
+                $('#addPlayerFormContainer').html(result).css('border', 'groove');
+            }
+        });
 
+        $("#addPlayerForm").validate({
+            rules: {
+                name: {
+                    required: true
+                }
+            }
+        });
+    }
+
+    function closeForm() {
+        $('#addPlayerFormContainer').remove();
+    }
+
+    function addPlayer(draftId) {
+
+        var name = $('#addPlayerNameInput').val();
+        var position = $('#addPlayerPosition option:selected').text();
+
+        var player = {
+            name: name,
+            position: position,
+            rank: players.length
+        };
+
+        closeForm();
+
+        $.ajax({
+            url: '/api/FantasyApi/AddPlayerToDraft/' + draftId,
+            type: 'PUT',
+            data: JSON.stringify(player),
+            contentType: "application/json; charset=utf-8",
+            processData: true,
+            cache: false,
+            success: function (result) {
+                players.push({
+                    id: result.id,
+                    name: result.name,
+                    rank: result.rank,
+                    position: result.position
+                });
+                $('#draftTable tbody tr:last').before('<tr><th scope="row">' + result.rank + '</th>' +
+                    '<td>' + GetPlayerLink(result.name) + '</td>' + '<td>' + result.position + '</td>' +
+                    '<td><button id="draftButton" class="btn btn-success">Draft</button></td>' + '</tr>');
+                filterPlayerAndPosition($('#filterPositions option:selected').text());
+            }
+        });
+    }
 });

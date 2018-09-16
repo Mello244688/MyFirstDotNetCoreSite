@@ -155,6 +155,30 @@ namespace MyFirstWebsite.Controllers
             return PartialView("_Card", draftboardViewModel);
         }
 
+        [Route("api/[controller]/GetAddPlayerForm")]
+        [HttpGet]
+        public IActionResult GetAddPlayerForm()
+        {
+            return PartialView("_AddPlayerForm");
+        }
+
+        [Route("api/[controller]/AddPlayerToDraft/{draftId}")]
+        [HttpPut]
+        public IActionResult AddPlayerToDraft([FromBody] Player player, int draftId)
+        {
+            appDbContext.Players.Add(player);
+            var draft = appDbContext.Drafts.Where(d => d.Id == draftId).Include(d => d.AvailablePlayers).FirstOrDefault();
+            DraftPlayer draftPlayer = new DraftPlayer();
+            draftPlayer.Draft = draft;
+            draftPlayer.DraftId = draft.Id;
+            draftPlayer.Player = player;
+
+            draft.AvailablePlayers.Add(draftPlayer);
+            appDbContext.SaveChanges();
+
+            return Json(new Player { Id = player.Id, Name = player.Name, Position = player.Position, Rank = player.Rank});
+        }
+
         [Route("api/[controller]/DeleteTeam/")]
         [HttpDelete]
         public void DeleteTeam([FromBody] Team team)
