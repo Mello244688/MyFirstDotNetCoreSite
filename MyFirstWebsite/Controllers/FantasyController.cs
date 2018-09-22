@@ -81,7 +81,8 @@ namespace MyFirstWebsite.Controllers
                 TeamsInDraft = new HashSet<Team>(),
                 AvailablePlayers = new HashSet<DraftPlayer>(),
                 NumberOfTeams = newDraft.NumberOfTeams,
-                PlayersDrafted = new HashSet<DraftDraftedPlayer>()
+                PlayersDrafted = new HashSet<DraftDraftedPlayer>(),
+                DateCreated = DateTime.Today
             };
 
             var availableDraftPlayers = new HashSet<DraftPlayer>();
@@ -132,7 +133,8 @@ namespace MyFirstWebsite.Controllers
         [Authorize]
         public IActionResult Teams()
         {
-            var teams = appDbContext.Teams.Where(t => t.UserId == userManager.GetUserId(User)).ToHashSet();
+            var teams = appDbContext.Teams.Where(t => t.UserId == userManager.GetUserId(User))
+                .Include(t => t.Draft);
             
             return View(teams);
         }

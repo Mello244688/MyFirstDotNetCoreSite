@@ -10,7 +10,7 @@ using MyFirstWebsite.Models;
 namespace MyFirstWebsite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20180902202137_initial")]
+    [Migration("20180922151632_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -192,6 +192,8 @@ namespace MyFirstWebsite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("DateCreated");
+
                     b.Property<int>("NumberOfTeams");
 
                     b.Property<int>("ScoringType");
@@ -224,9 +226,9 @@ namespace MyFirstWebsite.Migrations
 
                     b.Property<string>("Position");
 
-                    b.Property<int>("Rank");
+                    b.Property<int>("PositionDrafted");
 
-                    b.Property<int>("positionDrafted");
+                    b.Property<int>("Rank");
 
                     b.HasKey("Id");
 

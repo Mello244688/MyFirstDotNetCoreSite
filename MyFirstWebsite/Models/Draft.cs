@@ -11,6 +11,7 @@ namespace MyFirstWebsite.Models
         public int Id { get; set; }
         public ScoringType ScoringType { get; set; }
         public int NumberOfTeams { get; set; }
+        public DateTime DateCreated { get; set; }                
 
         public ICollection<Team> TeamsInDraft { get; set; }
 

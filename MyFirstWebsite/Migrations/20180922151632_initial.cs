@@ -56,7 +56,7 @@ namespace MyFirstWebsite.Migrations
                     Rank = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Position = table.Column<string>(nullable: true),
-                    positionDrafted = table.Column<int>(nullable: false)
+                    PositionDrafted = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,7 +70,8 @@ namespace MyFirstWebsite.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ScoringType = table.Column<int>(nullable: false),
-                    NumberOfTeams = table.Column<int>(nullable: false)
+                    NumberOfTeams = table.Column<int>(nullable: false),
+                    DateCreated = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
