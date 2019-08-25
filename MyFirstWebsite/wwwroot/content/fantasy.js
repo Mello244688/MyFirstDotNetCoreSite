@@ -28,6 +28,7 @@
         });
 
         $(document).on('click', '#draftButton', function () {
+
             var name = ($(this).closest('tr').children('td:first').text());
             var tr = $(this).closest('tr');
             var player;
@@ -39,7 +40,9 @@
                 }
             });
 
-            removePlayer(idStr, player);
+            if (player != null) {
+                removePlayer(idStr, player);
+            }
 
             updateRound();
             updateRoundAndPickText();
@@ -76,11 +79,11 @@
 
         $(document).on('click', '#hideShowTeamButton', function () {
             hideShowTeam();
-        })
+        });
 
         $(document).on('change', '#filterPositions', function () {
             filterPlayerAndPosition($(this).children('option:selected').text());
-        })
+        });
 
         $(document).on('click', '#addPlayer', function () {
             addPlayerForm();
@@ -274,9 +277,9 @@
             processData: true,
             cache: false,
             success: function (result) {
-                //if (isTurn(round, numPlayers, draftPosition, pickCounter)) {
-                //    addPlayerToTeam(idStr, player);
-                //}
+                if (isTurn(round, numPlayers, draftPosition, pickCounter)) {
+                    getUserTeam(idStr);
+                }
                 playersDrafted = [];
                 getDraftedPlayers(idStr);
                 pickCounter++;
@@ -473,7 +476,7 @@
             success: function (result) {
                 getUserTeam(idStr);
                 $('#teamTable tbody tr').children('td:nth-child(2)').remove();
-                $('#teamTable tbody tr').children('td:nth-child(2)')
+                $('#teamTable tbody tr').children('td:nth-child(2)');
                 playersEdited = [];
             }
         });

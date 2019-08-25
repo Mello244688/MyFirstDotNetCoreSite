@@ -17,7 +17,7 @@
         var team;
 
         $.each(teams, function (i, v) {
-            if (v.leagueName == leagueName && v.teamName == teamName) {
+            if (v.leagueName === leagueName && v.teamName === teamName) {
                 team = v;
             }
         });
@@ -32,7 +32,7 @@
 
             },
             error: function (result) {
-
+                console.log("Can't delete team: " + result);
             }
         });
     }
@@ -55,7 +55,7 @@
                 });
             },
             error: function (result) {
-
+                console.log("Can't get team: " + result);
             }
         });
     }
