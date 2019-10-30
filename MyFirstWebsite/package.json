@@ -5,7 +5,7 @@
   "devDependencies": {},
   "dependencies": {
     "bootstrap": "4.1.2",
-    "jquery": "3.3.1",
+    "jquery": "3.4.0",
     "popper.js": "1.14.3",
     "font-awesome": "4.7.0",
     "jquery-validation": "1.18.0"
