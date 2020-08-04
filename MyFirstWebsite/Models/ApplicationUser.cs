@@ -8,8 +8,6 @@ namespace MyFirstWebsite.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        //public int UserId { get; set; }
-
         public ICollection<Team> UserTeams { get; set; }
     }
 }

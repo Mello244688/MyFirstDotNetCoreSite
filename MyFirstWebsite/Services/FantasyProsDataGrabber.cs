@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MyFirstWebsite.Models;
-using HtmlAgilityPack;
-using MyFirstWebsite.ViewModels;
+﻿using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
+using MyFirstWebsite.Models;
+using System;
+using System.Collections.Generic;
 
 namespace MyFirstWebsite.Services
 {

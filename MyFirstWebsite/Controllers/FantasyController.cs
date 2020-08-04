@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using MyFirstWebsite.Models;
 using MyFirstWebsite.Services;
 using MyFirstWebsite.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -116,9 +114,9 @@ namespace MyFirstWebsite.Controllers
             var userId = userManager.GetUserId(User);
 
             var draft = appDbContext.Teams
+                .Include(t => t.Draft).ThenInclude(t => t.TeamsInDraft)
                 .Where(t => t.UserId == userId && t.DraftId == id)
-                .Select(t => t.Draft)
-                .Include(t => t.TeamsInDraft);
+                .Select(t => t.Draft);
 
             var team = draft.FirstOrDefault().TeamsInDraft.Where(ts => ts.UserId == userId).FirstOrDefault();
 
@@ -133,7 +131,8 @@ namespace MyFirstWebsite.Controllers
         [Authorize]
         public IActionResult Teams()
         {
-            var teams = appDbContext.Teams.Where(t => t.UserId == userManager.GetUserId(User))
+            var teams = appDbContext.Teams
+                .Where(t => t.UserId == userManager.GetUserId(User))
                 .Include(t => t.Draft);
             
             return View(teams);
