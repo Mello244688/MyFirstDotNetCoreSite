@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using MyFirstWebsite.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyFirstWebsite.Services
 {
@@ -35,7 +36,18 @@ namespace MyFirstWebsite.Services
             HashSet<Player> players = new HashSet<Player>();
 
             HtmlWeb htmlWeb = new HtmlWeb();
-            var doc = htmlWeb.Load(url);
+
+            HtmlDocument doc;
+
+            try
+            {
+                doc = htmlWeb.Load(url);
+            }
+            catch (Exception)
+            {
+                return players;
+            }
+            
             var node = doc.DocumentNode.SelectNodes("//*[@id=\"data\"]/tbody/tr");
 
             int intRank = 0;
@@ -51,8 +63,9 @@ namespace MyFirstWebsite.Services
                 }
                 var name = child.ChildNodes[2].InnerText;
                 var position = child.ChildNodes[4].InnerText;
+                var link = "https://fantasypros.com" + child.ChildNodes[2].FirstChild.Attributes.AttributesWithName("href").FirstOrDefault().Value;
 
-                players.Add(new Player { Rank = intRank, Name = name, Position = position });
+                players.Add(new Player { Rank = intRank, Name = name, Position = position, PlayerUrl = link });
 
             }
 

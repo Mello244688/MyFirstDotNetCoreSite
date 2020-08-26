@@ -8,7 +8,7 @@ namespace MyFirstWebsite.ViewModels
 {
     public class DraftboardViewModel
     {
-        public HashSet<DraftedPlayer> Players { get; set; }
+        public HashSet<Player> Players { get; set; }
         public int NumberOfTeams { get; set; }
     }
 }

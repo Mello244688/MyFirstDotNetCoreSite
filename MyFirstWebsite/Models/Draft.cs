@@ -11,11 +11,14 @@ namespace MyFirstWebsite.Models
         public int Id { get; set; }
         public ScoringType ScoringType { get; set; }
         public int NumberOfTeams { get; set; }
-        public DateTime DateCreated { get; set; }                
+        public int UserDraftPosition { get; set; }
+        public string LeagueName { get; set; }
+        public DateTime DateCreated { get; set; }
 
-        public ICollection<Team> TeamsInDraft { get; set; }
+        public string UserId { get; set; }
 
-        public ICollection<DraftPlayer> AvailablePlayers { get; set; }
-        public ICollection<DraftDraftedPlayer> PlayersDrafted { get; set; }
+        public ApplicationUser User { get; set; }
+
+        public ICollection<Team> Teams { get; set; }
     }
 }

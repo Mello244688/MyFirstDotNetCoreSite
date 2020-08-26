@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MyFirstWebsite.Migrations
 {
-    public partial class initialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -39,57 +39,12 @@ namespace MyFirstWebsite.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    DraftID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DraftedPlayer",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Rank = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Position = table.Column<string>(nullable: true),
-                    PositionDrafted = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DraftedPlayer", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Drafts",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ScoringType = table.Column<int>(nullable: false),
-                    NumberOfTeams = table.Column<int>(nullable: false),
-                    DateCreated = table.Column<DateTime>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Drafts", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Players",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Rank = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Position = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Players", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -199,27 +154,27 @@ namespace MyFirstWebsite.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DraftDraftedPlayer",
+                name: "Drafts",
                 columns: table => new
                 {
-                    DraftId = table.Column<int>(nullable: false),
-                    PlayerId = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ScoringType = table.Column<int>(nullable: false),
+                    NumberOfTeams = table.Column<int>(nullable: false),
+                    UserDraftPosition = table.Column<int>(nullable: false),
+                    LeagueName = table.Column<string>(nullable: true),
+                    DateCreated = table.Column<DateTime>(nullable: false),
+                    UserId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DraftDraftedPlayer", x => new { x.DraftId, x.PlayerId });
+                    table.PrimaryKey("PK_Drafts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DraftDraftedPlayer_Drafts_DraftId",
-                        column: x => x.DraftId,
-                        principalTable: "Drafts",
+                        name: "FK_Drafts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DraftDraftedPlayer_DraftedPlayer_PlayerId",
-                        column: x => x.PlayerId,
-                        principalTable: "DraftedPlayer",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -228,10 +183,8 @@ namespace MyFirstWebsite.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LeagueName = table.Column<string>(nullable: true),
                     TeamName = table.Column<string>(nullable: true),
                     DraftPosition = table.Column<int>(nullable: false),
-                    UserId = table.Column<string>(nullable: false),
                     DraftId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -243,56 +196,25 @@ namespace MyFirstWebsite.Migrations
                         principalTable: "Drafts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Teams_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DraftPlayer",
+                name: "Players",
                 columns: table => new
                 {
-                    DraftId = table.Column<int>(nullable: false),
-                    PlayerId = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Rank = table.Column<int>(nullable: false),
+                    PositionDrafted = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Position = table.Column<string>(nullable: true),
+                    TeamId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DraftPlayer", x => new { x.DraftId, x.PlayerId });
+                    table.PrimaryKey("PK_Players", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DraftPlayer_Drafts_DraftId",
-                        column: x => x.DraftId,
-                        principalTable: "Drafts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DraftPlayer_Players_PlayerId",
-                        column: x => x.PlayerId,
-                        principalTable: "Players",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TeamPlayer",
-                columns: table => new
-                {
-                    TeamId = table.Column<int>(nullable: false),
-                    PlayerId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TeamPlayer", x => new { x.TeamId, x.PlayerId });
-                    table.ForeignKey(
-                        name: "FK_TeamPlayer_Players_PlayerId",
-                        column: x => x.PlayerId,
-                        principalTable: "Players",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TeamPlayer_Teams_TeamId",
+                        name: "FK_Players_Teams_TeamId",
                         column: x => x.TeamId,
                         principalTable: "Teams",
                         principalColumn: "Id",
@@ -339,29 +261,19 @@ namespace MyFirstWebsite.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DraftDraftedPlayer_PlayerId",
-                table: "DraftDraftedPlayer",
-                column: "PlayerId");
+                name: "IX_Drafts_UserId",
+                table: "Drafts",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DraftPlayer_PlayerId",
-                table: "DraftPlayer",
-                column: "PlayerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TeamPlayer_PlayerId",
-                table: "TeamPlayer",
-                column: "PlayerId");
+                name: "IX_Players_TeamId",
+                table: "Players",
+                column: "TeamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Teams_DraftId",
                 table: "Teams",
                 column: "DraftId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Teams_UserId",
-                table: "Teams",
-                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -382,22 +294,10 @@ namespace MyFirstWebsite.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "DraftDraftedPlayer");
-
-            migrationBuilder.DropTable(
-                name: "DraftPlayer");
-
-            migrationBuilder.DropTable(
-                name: "TeamPlayer");
+                name: "Players");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "DraftedPlayer");
-
-            migrationBuilder.DropTable(
-                name: "Players");
 
             migrationBuilder.DropTable(
                 name: "Teams");

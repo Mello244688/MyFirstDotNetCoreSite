@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Draft>
+
+@section Scripts{ 
+    <script src="~/content/draftsList.js"></script>
+}
+<table class="table" id="listOfDraftsTable">
+    <thead>
+        <tr>
+            <th>My Drafts</th>
+            <th ></th>
+            <th style="text-align:center"><a asp-controller="Fantasy" asp-action="New">New Draft</a></th>
+        </tr>
+    </thead>
+
+    @foreach (var draft in Model)
+    {
+        <tbody>
+            <tr data-team-name="@draft.Teams.Where(t => t.DraftPosition == draft.UserDraftPosition).FirstOrDefault().TeamName" data-league-name="@draft.LeagueName">
+                <td class="ml-auto"><a asp-controller="Fantasy" asp-action="Draft" asp-route-id="@draft.Id">League: @draft.LeagueName Team: @draft.Teams.Where(t => t.DraftPosition == draft.UserDraftPosition).FirstOrDefault().TeamName</a></td>
+                <td>@draft.DateCreated.Year</td>
+                <td align="center"><button class="fa fa-times btn-transparent"></button></td>
+            </tr>
+        </tbody>
+    }
+</table>

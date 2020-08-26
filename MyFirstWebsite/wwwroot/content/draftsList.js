@@ -1,11 +1,11 @@
 ﻿$(function () {
     var teams = [];
 
-    getAllTeams();
+    getAllDrafts();
     setupEvents();
 
     function setupEvents() {
-        $(document).on('click', '#listOfTeamsTable button', function () {
+        $(document).on('click', '#listOfDraftsTable button', function () {
             var teamName = $(this).closest('tr').data('teamName');
             var leageName = $(this).closest('tr').data('leagueName');
             deleteTeam(teamName, leageName);
@@ -22,7 +22,7 @@
             }
         });
         $.ajax({
-            url: '/api/FantasyApi/DeleteTeam/',
+            url: '/api/FantasyApi/DeleteDraft/',
             type: "DELETE",
             data: JSON.stringify(team),
             contentType: "application/json; charset=utf-8",
@@ -32,14 +32,14 @@
 
             },
             error: function (result) {
-                console.log("Can't delete team: " + result);
+                console.log("Can't delete draft: " + result);
             }
         });
     }
 
-    function getAllTeams() {
+    function getAllDrafts() {
         $.ajax({
-            url: '/api/FantasyApi/GetAllUserTeams/',
+            url: '/api/FantasyApi/GetAllUserDrafts/',
             type: "GET",
             data: {},
             contentType: "application/json; charset=utf-8",

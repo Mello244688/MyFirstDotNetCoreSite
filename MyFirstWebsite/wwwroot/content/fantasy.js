@@ -5,19 +5,20 @@
     var players = [];
     var draftedPlayers = [];
     var playersEdited = [];
-    var numPlayers;
-    var draftPosition;
-    var pickCounter = 1;
-    var round = 1;
+    var numTeams;
+    var draftPosition = getDraftPosition(idStr);
+    var pickCounter = parseInt($('#pickVal').text());
+    var round = parseInt($('#roundVal').text());
 
+    console.log(pickCounter);
     setUpEventListeners();
     hideDraftBoard();
-    getAvailablePlayers(idStr);
-    setUpRoundAndPickLabels(round, pickCounter);
-    updateRoundAndPickText();
+
+    getDraftPick(idStr);
     getNumberOfDraftTeams(idStr);
-    getDraftPosition(idStr);
-    getDraftedPlayers(idStr);
+
+    getAvailablePlayers(idStr);
+    
     getUserTeam(idStr);
 
     function setUpEventListeners() {
@@ -41,7 +42,7 @@
             });
 
             if (player != null) {
-                removePlayer(idStr, player);
+                AddPlayerToTeam(idStr, getTeamNum(round, pickCounter, numTeams), player);
             }
 
             updateRound();
@@ -99,10 +100,6 @@
         });
     }
 
-    function setUpRoundAndPickLabels(round, pickCounter) {
-        $('#roundPickGroup').append('<div class="col-md-6"><h4 id="round">Round: ' + round + '</h4></div><div class="col-md-6"><h4 id="pick">Pick: ' + pickCounter + '</h4></div>');
-    }
-
     function getAvailablePlayers(draftId) {
         $.ajax({
             url: '/api/FantasyApi/GetAvailablePlayers/' + draftId,
@@ -116,10 +113,11 @@
                         id: v.id,
                         rank: v.rank,
                         name: v.name,
-                        position: v.position
+                        position: v.position,
+                        playerUrl: v.playerUrl
                     });
                     $('#draftTable tbody').append('<tr><th scope="row">' + v.rank + '</th>' +
-                        '<td>' + GetPlayerLink(v.name) + '</td>' + '<td>' + v.position + '</td>' +
+                        '<td>' + getPlayerLink(v) + '</td>' + '<td>' + v.position + '</td>' +
                         '<td><button id="draftButton" class="btn btn-success">Draft</button></td>' + '</tr>');
                 });
                 $('#draftTable tbody').append('<tr><td><button class="btn btn-link" id="addPlayer">Add Player</button><td/td></tr>');
@@ -128,14 +126,6 @@
 
             }
         });
-    }
-
-    function formatName(pname) {
-        var first = pname.indexOf(' ');
-        var second = pname.indexOf(' ', first + 1);
-        var newName = pname.substring(0, first) + "-" + pname.substring(first + 1, second);
-
-        return newName.trim().toLowerCase().replace(/'/, '');
     }
 
     function filterPlayerAndPosition(position) {
@@ -166,16 +156,28 @@
         }
     }
 
+    function getDraftPick(draftId) {
+        return $.ajax({
+            url: '/api/FantasyApi/GetDraftPickNumber/' + draftId,
+            type: 'GET',
+            contentType: "application/json; charset=utf-8",
+            processData: true,
+            success: function (result) {
+                pickCounter = result;
+            }
+        }).responseJSON;
+    }
+
     function getUserTeam(draftId) {
 
         var tableRow = $('#teamTable tr:contains(position)');
 
         $.ajax({
-            url: '/api/FantasyApi/GetUserTeam/' + draftId,
-            type: 'GET',
+            url: "/api/FantasyApi/GetUserTeam/" + draftId,
+            type: "GET",
+            data: {},
             contentType: "application/json; charset=utf-8",
-            processData: true,
-            cache: false,
+            dataType: "json",
             success: function (result) {
                 $.each(result, function (i, v) {
 
@@ -195,22 +197,20 @@
 
                     if (tableRow.length == 0 && player.length == 0) {
                         if (flexPosition.children().length == 1 && (position == 'WR' || position == 'RB' || position == 'TE')) {
-                            flexPosition.first().append('<td>' + GetPlayerLink(v.name) + '</td>');
+                            flexPosition.first().append('<td>' + getPlayerLink(v) + '</td>');
                         } else {
-                            $('#teamTable tbody').append('<tr><td>BN</td><td>' + GetPlayerLink(v.name) + '</td></tr>');
+                            $('#teamTable tbody').append('<tr><td>BN</td><td>' + getPlayerLink(v) + '</td></tr>');
                         }
 
                     } else if (player.length == 0) {
-                        tableRow.first().append('<td>' + GetPlayerLink(v.name) + '</td>');
+                        tableRow.first().append('<td>' + getPlayerLink(v) + '</td>');
                     }
                 });
+            },
+            error: function (result) {
+                console.log(result);
             }
         });
-    }
-
-    function GetPlayerLink(name) {
-        return '<a href="https://www.fantasypros.com/nfl/players/' + formatName(name) +
-            '.php" target="_blank"' + '>' + name + '</a>';
     }
 
     function getNumberOfDraftTeams(draftId) {
@@ -220,106 +220,62 @@
             contentType: "application/json; charset=utf-8",
             processData: true,
             success: function (result) {
-                numPlayers = result;
-                updateRoundAndPickText();
+                numTeams = result;
             }
         }).responseJSON;
     }
 
     function getDraftPosition(draftId) {
-        return $.ajax({
+        $.ajax({
             url: '/api/FantasyApi/GetDraftPosition/' + draftId,
             type: 'GET',
             contentType: "application/json; charset=utf-8",
             processData: true,
             success: function (result) {
-                draftPosition = result;
+                return result;
             }
         }).responseJSON;
     }
 
-    function getDraftedPlayers(draftId) {
-        $.ajax({
-            url: '/api/FantasyApi/GetDraftedPlayers/' + draftId,
-            type: "GET",
-            data: {},
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (result) {
-                pickCounter = result.length + 1;
-                updateRoundAndPickText();
-
-                $.each(result, function (i, v) {
-                    draftedPlayers.push({
-                        id: v.id,
-                        rank: v.rank,
-                        name: v.name,
-                        position: v.position,
-                        positionDrafted: v.positionDrafted
-                    });
-                });
-            },
-            error: function (result) {
-
-            }
-        });
-    }
-
-    function addPlayerToDrafted(draftId, player) {
+    function AddPlayerToTeam(draftId, teamNum, player) {
 
         player.positionDrafted = pickCounter;
 
         $.ajax({
-            url: '/api/FantasyApi/AddToDrafted/' + draftId,
+            url: '/api/FantasyApi/AddToTeam/' + draftId + '/' + teamNum,
             type: 'PUT',
             data: JSON.stringify(player),
             contentType: "application/json; charset=utf-8",
             processData: true,
             cache: false,
             success: function (result) {
-                if (isTurn(round, numPlayers, draftPosition, pickCounter)) {
+                if (isTurn(round, numTeams, draftPosition, pickCounter)) {
                     getUserTeam(idStr);
                 }
-                playersDrafted = [];
-                getDraftedPlayers(idStr);
+
                 pickCounter++;
-                updateRoundAndPickText();
+                updateRound(pickCounter, numTeams);
+                updateRoundAndPickText(round, pickCounter);
             }
         });
     }
 
-    function removePlayer(draftId, player) {
-        $.ajax({
-            url: '/api/FantasyApi/RemovePlayer/' + draftId,
-            type: 'DELETE',
-            data: JSON.stringify(player),
-            contentType: "application/json; charset=utf-8",
-            processData: true,
-            cache: false,
-            success: function (result) {
-                addPlayerToDrafted(idStr, player);
-            }
-        });
+    function updateRoundAndPickText(rnd, pick) {
+        $('#roundVal').text(rnd);
+        $('#pickVal').text(pick);
     }
 
-    function updateRoundAndPickText() {
-        $('#round').text("Round: " + round);
-        $('#pick').text("Pick: " + pickCounter);
+    function updateRound(pickCounter, numTeams) {
+
+        round = Math.ceil(pickCounter / numTeams);
     }
 
-    function updateRound() {
-
-        round = Math.ceil(pickCounter / numPlayers);
-        if (pickCounter == 0)
-            round = 1;
-    }
-
-    function isTurn(r, numPlayers, draftPick, numPicks) {
+    function isTurn(r, numTeams, draftPick, numPicks) {
         if (r % 2 == 0) {
 
-            return (r * numPlayers - draftPick + 1) == numPicks;
+            return (r * numTeams - draftPick + 1) == numPicks;
         }
-        return ((r - 1) * numPlayers + draftPick) == numPicks;
+        return ((r - 1) * numTeams + draftPick) == numPicks;
 
     }
 
@@ -455,7 +411,7 @@
                     player2 = v;
                 }
             });
-            var temp = player1.positionDrafted
+            var temp = player1.positionDrafted;
             player1.positionDrafted = player2.positionDrafted;
             player2.positionDrafted = temp;
 
@@ -464,6 +420,7 @@
         }
     }
 
+    //TODO: need to fix to swap players on teams
     function swapDraftedPlayers(players, draftId) {
         
         $.ajax({
@@ -551,5 +508,39 @@
                 filterPlayerAndPosition($('#filterPositions option:selected').text());
             }
         });
+    }
+
+    function getTeamNum(roundNum, pickNum, numTeams) {
+
+        var mnum = 0;
+
+        //odd round
+        if (roundNum % 2 === 1) {
+            if (pickNum % numTeams === 0)
+                num = numTeams;
+            else
+                num = pickNum % numTeams;
+        }
+        //even round
+        else {
+            if (pickNum % numTeams === 0)
+                num = 1;
+            else
+                num = (numTeams - pickNum % numTeams) + 1;
+        }
+        return num;
+    }
+
+    function getPlayerLink(player) {
+        return '<a href="' + player.playerLink + '" target="_blank">' + player.name + '</a>'
+    }
+
+    /**
+     * This is for draft info such as pickNumber, round, numberOfDraftTeams, etc.
+     * Don't really want seperate API calls for this stuff
+     * @param {any} draftId
+     */
+    function getDraftInfo(draftId) {
+
     }
 });

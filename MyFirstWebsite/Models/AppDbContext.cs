@@ -12,53 +12,20 @@ namespace MyFirstWebsite.Models
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<Draft>()
+                .HasOne(d => d.User)
+                .WithMany(u => u.Drafts)
+                .HasForeignKey(d => d.UserId);
 
-            builder.Entity<DraftPlayer>().HasKey(t => new { t.DraftId, t.PlayerId });
-            builder.Entity<TeamPlayer>().HasKey(t => new {t.TeamId, t.PlayerId});
-            builder.Entity<DraftDraftedPlayer>().HasKey(t => new { t.DraftId, t.PlayerId });
-
-            //team has one user with many teams
             builder.Entity<Team>()
-                .HasOne(u => u.User)
-                .WithMany(t => t.UserTeams)
-                .IsRequired();
+                .HasOne(t => t.Draft)
+                .WithMany(d => d.Teams)
+                .HasForeignKey(t => t.DraftId);
 
-            //team has one draft with many teams
-            builder.Entity<Team>()
-                .HasOne(d => d.Draft)
-                .WithMany(t => t.TeamsInDraft)
-                .HasForeignKey(t => t.DraftId)
-                .IsRequired();
-
-            builder.Entity<DraftPlayer>()
-                .HasOne(dp => dp.Draft)
-                .WithMany(d => d.AvailablePlayers)
-                .HasForeignKey(dp => dp.DraftId);
-
-            builder.Entity<DraftPlayer>()
-                .HasOne(dp => dp.Player)
-                .WithMany(p => p.DraftPlayer)
-                .HasForeignKey(dp => dp.PlayerId);
-
-            builder.Entity<DraftDraftedPlayer>()
-                .HasOne(ddp => ddp.Draft)
-                .WithMany(d => d.PlayersDrafted)
-                .HasForeignKey(pd => pd.DraftId);
-
-            builder.Entity<DraftDraftedPlayer>()
-                .HasOne(ddp => ddp.Player)
-                .WithMany(p => p.DraftDraftedPlayer)
-                .HasForeignKey(fk => fk.PlayerId);
-
-            builder.Entity<TeamPlayer>()
-                .HasOne(tp => tp.Team)
-                .WithMany(t => t.LineUp)
-                .HasForeignKey(tp => tp.TeamId);
-
-            builder.Entity<TeamPlayer>()
-                .HasOne(tp => tp.Player)
-                .WithMany(p => p.TeamPlayer)
-                .HasForeignKey(tp => tp.PlayerId);
+            builder.Entity<Player>()
+                .HasOne(p => p.Team)
+                .WithMany(t => t.Players)
+                .HasForeignKey(p => p.TeamId);
             
             base.OnModelCreating(builder);
         }

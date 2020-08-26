@@ -10,14 +10,14 @@ using MyFirstWebsite.Models;
 namespace MyFirstWebsite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200804033433_initialMigration")]
-    partial class initialMigration
+    [Migration("20200824024856_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.6")
+                .HasAnnotation("ProductVersion", "3.1.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -168,6 +168,9 @@ namespace MyFirstWebsite.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("DraftID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
@@ -231,48 +234,29 @@ namespace MyFirstWebsite.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("LeagueName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("NumberOfTeams")
                         .HasColumnType("int");
 
                     b.Property<int>("ScoringType")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserDraftPosition")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Drafts");
                 });
 
-            modelBuilder.Entity("MyFirstWebsite.Models.DraftDraftedPlayer", b =>
-                {
-                    b.Property<int>("DraftId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlayerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DraftId", "PlayerId");
-
-                    b.HasIndex("PlayerId");
-
-                    b.ToTable("DraftDraftedPlayer");
-                });
-
-            modelBuilder.Entity("MyFirstWebsite.Models.DraftPlayer", b =>
-                {
-                    b.Property<int>("DraftId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlayerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DraftId", "PlayerId");
-
-                    b.HasIndex("PlayerId");
-
-                    b.ToTable("DraftPlayer");
-                });
-
-            modelBuilder.Entity("MyFirstWebsite.Models.DraftedPlayer", b =>
+            modelBuilder.Entity("MyFirstWebsite.Models.Player", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -291,28 +275,12 @@ namespace MyFirstWebsite.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("DraftedPlayer");
-                });
-
-            modelBuilder.Entity("MyFirstWebsite.Models.Player", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Position")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Rank")
+                    b.Property<int>("TeamId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("Players");
                 });
@@ -330,38 +298,14 @@ namespace MyFirstWebsite.Migrations
                     b.Property<int>("DraftPosition")
                         .HasColumnType("int");
 
-                    b.Property<string>("LeagueName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("TeamName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DraftId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Teams");
-                });
-
-            modelBuilder.Entity("MyFirstWebsite.Models.TeamPlayer", b =>
-                {
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlayerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TeamId", "PlayerId");
-
-                    b.HasIndex("PlayerId");
-
-                    b.ToTable("TeamPlayer");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -415,32 +359,18 @@ namespace MyFirstWebsite.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MyFirstWebsite.Models.DraftDraftedPlayer", b =>
+            modelBuilder.Entity("MyFirstWebsite.Models.Draft", b =>
                 {
-                    b.HasOne("MyFirstWebsite.Models.Draft", "Draft")
-                        .WithMany("PlayersDrafted")
-                        .HasForeignKey("DraftId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MyFirstWebsite.Models.DraftedPlayer", "Player")
-                        .WithMany("DraftDraftedPlayer")
-                        .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("MyFirstWebsite.Models.ApplicationUser", "User")
+                        .WithMany("Drafts")
+                        .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("MyFirstWebsite.Models.DraftPlayer", b =>
+            modelBuilder.Entity("MyFirstWebsite.Models.Player", b =>
                 {
-                    b.HasOne("MyFirstWebsite.Models.Draft", "Draft")
-                        .WithMany("AvailablePlayers")
-                        .HasForeignKey("DraftId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MyFirstWebsite.Models.Player", "Player")
-                        .WithMany("DraftPlayer")
-                        .HasForeignKey("PlayerId")
+                    b.HasOne("MyFirstWebsite.Models.Team", "Team")
+                        .WithMany("Players")
+                        .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -448,29 +378,8 @@ namespace MyFirstWebsite.Migrations
             modelBuilder.Entity("MyFirstWebsite.Models.Team", b =>
                 {
                     b.HasOne("MyFirstWebsite.Models.Draft", "Draft")
-                        .WithMany("TeamsInDraft")
+                        .WithMany("Teams")
                         .HasForeignKey("DraftId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MyFirstWebsite.Models.ApplicationUser", "User")
-                        .WithMany("UserTeams")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MyFirstWebsite.Models.TeamPlayer", b =>
-                {
-                    b.HasOne("MyFirstWebsite.Models.Player", "Player")
-                        .WithMany("TeamPlayer")
-                        .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MyFirstWebsite.Models.Team", "Team")
-                        .WithMany("LineUp")
-                        .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
