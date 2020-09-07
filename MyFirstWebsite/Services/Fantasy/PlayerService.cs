@@ -1,5 +1,4 @@
-﻿using MyFirstWebsite.Repositories;
-using MyFirstWebsite.Repositories.Fantasy;
+﻿using MyFirstWebsite.Repositories.Fantasy;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyFirstWebsite.Services.Fantasy
 {
-    public interface IPlayerService : IPlayerRepository
+    public class PlayerService: PlayerRepository, IPlayerService
     {
     }
 }

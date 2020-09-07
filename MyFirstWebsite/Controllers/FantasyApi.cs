@@ -149,16 +149,16 @@ namespace MyFirstWebsite.Controllers
                 
         }
         */
-        private Player GetNewPlayer(List<DraftedPlayer> playersDrafted, int i)
-        {
-            return new Player
-            {
-                Id = playersDrafted.ElementAt(i).Id,
-                Name = playersDrafted.ElementAt(i).Name,
-                Position = playersDrafted.ElementAt(i).Position,
-                Rank = playersDrafted.ElementAt(i).Rank
-            };
-        }
+        //private Player GetNewPlayer(List<DraftedPlayer> playersDrafted, int i)
+        //{
+        //    return new Player
+        //    {
+        //        Id = playersDrafted.ElementAt(i).Id,
+        //        Name = playersDrafted.ElementAt(i).Name,
+        //        Position = playersDrafted.ElementAt(i).Position,
+        //        Rank = playersDrafted.ElementAt(i).Rank
+        //    };
+        //}
 
         private Team GetTeam(int draftId, int teamNum)
         {

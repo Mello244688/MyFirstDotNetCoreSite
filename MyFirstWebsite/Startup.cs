@@ -7,7 +7,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyFirstWebsite.Models;
+using MyFirstWebsite.Repositories;
+using MyFirstWebsite.Repositories.Fantasy;
 using MyFirstWebsite.Services;
+using MyFirstWebsite.Services.Fantasy;
 
 namespace MyFirstWebsite
 {
@@ -26,7 +29,11 @@ namespace MyFirstWebsite
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IFantasyProsDataGrabber, FantasyProsDataGrabber>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
-            services.AddTransient<IDraftTeamsRepository, DraftTeamsRepository>();
+            services.AddTransient<IDraftRepository, DraftRepository>();
+            services.AddTransient<ITeamRepository, TeamRepository>();
+            services.AddTransient<IPlayerService, PlayerService>();
+            services.AddTransient<IDraftService, DraftService>();
+            services.AddTransient<ITeamService, TeamService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
