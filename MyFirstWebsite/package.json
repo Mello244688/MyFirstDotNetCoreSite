@@ -8,6 +8,6 @@
     "jquery": "3.3.1",
     "popper.js": "1.14.3",
     "font-awesome": "4.7.0",
-    "jquery-validation": "1.18.0"
+    "jquery-validation": "1.19.3"
   }
 }
