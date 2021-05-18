@@ -39,8 +39,7 @@ namespace MyFirstWebsite.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false),
-                    DraftID = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -208,6 +207,7 @@ namespace MyFirstWebsite.Migrations
                     PositionDrafted = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Position = table.Column<string>(nullable: true),
+                    PlayerUrl = table.Column<string>(nullable: true),
                     TeamId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
