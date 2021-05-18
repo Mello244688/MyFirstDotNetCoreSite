@@ -24,20 +24,19 @@
                     <a asp-controller="Home" asp-action="About" class="nav-link">About</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Links
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="https://github.com/Mello244688">GitHub</a>
-                        <a class="dropdown-item" href="https://www.linkedin.com/in/scott-mello">LinkedIn</a>
-                        @*<div class="dropdown-divider"></div>*@
+                        <a class="dropdown-item" href="https://github.com/Mello244688" target="_blank">GitHub</a>
+                        <a class="dropdown-item" href="https://www.linkedin.com/in/scott-mello" target="_blank">LinkedIn</a>
                     </div>
                 </li>
                 <li class="nav-item" is-active-route asp-action="Index" asp-controller="Contact">
                     <a asp-controller="Contact" asp-action="Index" class="nav-link">Contact Me</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Fantasy Football
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
@@ -52,9 +51,8 @@
         </div>
     </nav>
 
-    <partial name="_CookieConsentPartial" />
-
     <div class="container body-content col-md-12">
+        <partial name="_CookieConsentPartial" />
         <div class="row justify-content-center" id="body-row">
             @RenderBody()
         </div>
@@ -65,7 +63,6 @@
     </div>
     <script src="~/node_modules/jquery/dist/jquery.slim.min.js"></script>
     <script src="~/node_modules/jquery/dist/jquery.js"></script>
-    <script src="~/node_modules/popper.js/dist/umd/popper.min.js"></script>
     <script src="~/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/content/site.js"></script>
     @RenderSection("scripts", required: false)
