@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +27,10 @@ namespace MyFirstWebsite
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        { 
+        {
+            services.AddControllersWithViews(options =>
+                options.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>());
+
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IFantasyProsDataGrabber, FantasyProsDataGrabber>();
             services.AddTransient<IPlayerRepository, PlayerRepository>();
@@ -43,6 +48,7 @@ namespace MyFirstWebsite
             });
 
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddDefaultIdentity<ApplicationUser>().AddEntityFrameworkStores<AppDbContext>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
         }
@@ -53,7 +59,7 @@ namespace MyFirstWebsite
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseMigrationsEndPoint();
             }
             else
             {
