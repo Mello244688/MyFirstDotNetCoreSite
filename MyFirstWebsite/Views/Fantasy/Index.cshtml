@@ -5,7 +5,7 @@
 </div>
 <div class="row col-md-10">
     <form method="post" class="form-inline">
-        <select asp-items="@Html.GetEnumSelectList<ScoringType>()" asp-for="ScoringType" class="custom-select"></select>
+        <select asp-items="@Html.GetEnumSelectList<ScoringType>()" asp-for="ScoringType" class="form-select"></select>
         <input type="submit" value="Submit" class="btn btn-primary">
     </form>
 </div>

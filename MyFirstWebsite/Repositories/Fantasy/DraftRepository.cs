@@ -32,7 +32,8 @@ namespace MyFirstWebsite.Repositories.Fantasy
         public List<Draft> GetAllDrafts(string userId)
         {
             return _appDbContext.Drafts
-                .Where(ds => ds.UserId == userId).ToList();
+                .Where(ds => ds.UserId == userId)
+                .Include(ts => ts.Teams).ToList();
         }
 
         public Draft GetDraft(int id)

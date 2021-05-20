@@ -9,7 +9,7 @@ namespace MyFirstWebsite.Services.Fantasy
     {
         private readonly ITeamRepository _teamRepository;
 
-        public TeamService(ITeamRepository teamRepository)
+        public TeamService(AppDbContext appDbContext, ITeamRepository teamRepository) : base(appDbContext)
         {
             _teamRepository = teamRepository;
         }
