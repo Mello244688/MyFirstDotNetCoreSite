@@ -8,26 +8,24 @@
 <!--$('#roundPickGroup').append('<div class="col-md-6"><h4 id="round">Round: ' + rnd + '</h4></div><div class="col-md-6"><h4 id="pick">Pick: ' + pick + '</h4></div>');-->
 
 <div class="col-md-12 mb-3">
-    <div class="row">
+    <div class="row col-md-12">
         <div class="col-md-9"><h3>@Model.LeagueName</h3></div>
         <div class="btn-group col-md-3">
-            <div class="col-md-5"><button class="btn btn-primary float-right col-12" id="hideShowTeamButton">Hide Team</button></div>
-            <div class="col-md-7"><button class="btn btn-primary float-right col-12" id="draftBoardButton">Draft Board</button></div>
+            <div class="col-6"><button class="btn btn-primary col-12" id="hideShowTeamButton">Hide Team</button></div>
+            <div class="col-6"><button class="btn btn-primary col-12" id="draftBoardButton">Draft Board</button></div>
         </div>
         <div class="btn-group col-md-3">
-            <div class="col-md-5"><button class="btn btn-primary float-right col-12" id="editDraftButton">Edit</button></div>
-            <div class="col-md-7"><button class="btn btn-primary float-right col-12" id="draftButton">Draft</button></div>
+            <div class="col-6"><button class="btn btn-primary float-right col-12" id="editDraftButton">Edit</button></div>
+            <div class="col-6"><button class="btn btn-primary float-right col-12" id="draftButton">Draft</button></div>
         </div>
     </div>
 </div>
 
 <div id="draftContent" class="col-md-12">
-    <div class="row">
+    <div class="row col-md-12">
         <div class="col-md-8">
             <div class="input-group input-group-lg mb-3 justify-content-left" id="searchBar">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-search"></i></span>
-                </div>
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
                 <input class="form-control" type="text" placeholder="Search" id="searchInput">
             </div>
         </div>
@@ -43,10 +41,10 @@
                     <h4 class="col-md-3" id="pickVal">@Model.pick</h4>
                 </div>'
             </div>
+        </div>
     </div>
-
     <div class="row col-md-12" id="draftInfoRow">
-        <div class="col-md-8">
+        <div class="col-md-8 bdr">
             <table class="table col-md-12" id="draftTable">
                 <thead>
                     <tr>
@@ -69,24 +67,24 @@
                 <tbody></tbody>
             </table>
         </div>
-
-        <table class="col-md-4" id="teamTable">
-            <thead>
-                <tr><th>@Model.TeamName</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>QB</td></tr>
-                <tr><td>RB</td></tr>
-                <tr><td>RB</td></tr>
-                <tr><td>WR</td></tr>
-                <tr><td>WR</td></tr>
-                <tr><td>FLEX</td></tr>
-                <tr><td>TE</td></tr>
-                <tr><td>K</td></tr>
-                <tr><td>DEF</td></tr>
-            </tbody>
-        </table>
+        <div class="col-md-4 bdr">
+            <table class="col-md-12" id="teamTable">
+                <thead>
+                    <tr><th>@Model.TeamName</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>QB</td></tr>
+                    <tr><td>RB</td></tr>
+                    <tr><td>RB</td></tr>
+                    <tr><td>WR</td></tr>
+                    <tr><td>WR</td></tr>
+                    <tr><td>FLEX</td></tr>
+                    <tr><td>TE</td></tr>
+                    <tr><td>K</td></tr>
+                    <tr><td>DEF</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 </div>
 <div class="col-12 justify-content-center" id="draftBoard"></div>

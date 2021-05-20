@@ -285,7 +285,7 @@
         $('#draftContent').show();
         $('#draftBoardButton').parent().parent().show();
         $('#draftbutton').parent().parent().removeClass('col-md-3');
-        $('#draftBoardButton').parent().addClass('col-md-3');
+        $('#draftBoardButton').parent().parent().addClass('col-md-3');
     }
 
     function hideDraft() {
@@ -293,7 +293,7 @@
         $('#draftButton').parent().parent().show();
         $('#draftBoardButton').parent().parent().hide();
         $('#draftBoard').show();
-        $('#draftBoardButton').parent().removeClass('col-md-3');
+        $('#draftBoardButton').parent().parent().removeClass('col-md-3');
         $('#draftbutton').parent().parent().addClass('col-md-3');  
     }
 

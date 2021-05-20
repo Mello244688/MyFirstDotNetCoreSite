@@ -1,13 +1,13 @@
 ﻿body {
-    background-image: url('../images/pattern.png');
+    background-image: url('../images/background.jpg');
     background-repeat: repeat;
     padding-top: 25px;
     padding-bottom: 20px;
 }
 
 .body-content {
-    padding-left: 35px;
-    padding-right: 35px;
+    padding-left: 15px;
+    padding-right: 5px;
     padding-top: 15px;
 }
 
@@ -61,7 +61,7 @@ table {
 
 #draftTable, #teamTable {
     border-collapse: collapse; /* Collapse borders */
-    width: 100%; /* Full-width */
+    /*width: 100%;*/ /* Full-width */
     border: 1px solid #ddd; /* Add a grey border */
     font-size: 18px; /* Increase font-size */
 }
@@ -102,10 +102,6 @@ table {
     bottom: 0;
     position: absolute;
 }
-
-/*#draftButton, #draftBoardButton {
-    width: 55%;
-}*/
 
 .btn-group div {
     padding-left: 1px;
@@ -177,5 +173,14 @@ table {
     z-index: 2;
 }
 
+.btn-group button {
+    height: 100%;
+}
+
+table {
+    border: 1px solid black;
+    border-radius: 10px;
+    overflow: hidden;
+}
 
 

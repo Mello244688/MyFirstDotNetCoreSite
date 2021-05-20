@@ -91,6 +91,7 @@ namespace MyFirstWebsite.Controllers
             Team availablePlayers = _teamService.GetAvailablePlayers(draft);
 
             draftViewModel.LeagueName = draft.LeagueName;
+            draftViewModel.TeamName = userTeam.TeamName;
             draftViewModel.DraftPosition = draft.UserDraftPosition;
             draftViewModel.NumberOfTeams = draft.NumberOfTeams;
             draftViewModel.MyPlayers = userTeam.Players.ToHashSet();
