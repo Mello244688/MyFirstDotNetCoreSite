@@ -23,12 +23,30 @@ namespace MyFirstWebsite.Repositories.Fantasy
                 .Include(t => t.Players);
         }
 
-        public Team GetTeam(int teamId, int draftId)
+        public Team GetTeam(int teamId)
         {
             return _appDbContext.Teams
-                .Where(ts => ts.Id == teamId && ts.DraftId == draftId)
+                .Where(ts => ts.Id == teamId)
                 .Include(t => t.Players)
                 .FirstOrDefault();
+        }
+
+        public Team GetTeam(int draftId, int draftPosition)
+        {
+            return _appDbContext.Teams
+                .Where(ts => ts.DraftId == draftId && ts.DraftPosition == draftPosition)
+                .Include(t => t.Players)
+                .FirstOrDefault();
+        }
+
+        public void Save()
+        {
+            _appDbContext.SaveChanges();
+        }
+
+        public void UpdateTeam(Team team)
+        {
+            _appDbContext.Attach(team);
         }
     }
 }

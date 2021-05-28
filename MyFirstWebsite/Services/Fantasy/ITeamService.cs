@@ -9,7 +9,10 @@ namespace MyFirstWebsite.Services.Fantasy
 {
     public interface ITeamService : ITeamRepository
     {
-        Team GetUserTeam(Draft draft);
         Team GetAvailablePlayers(Draft draft);
+        Team GetAvailablePlayersById(int draftId);
+        Team GetUserTeam(Draft draft);
+        Team GetUserTeamById(int draftId);
+
     }
 }

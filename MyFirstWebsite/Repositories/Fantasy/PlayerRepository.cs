@@ -8,7 +8,12 @@ namespace MyFirstWebsite.Repositories.Fantasy
 {
     public class PlayerRepository : IPlayerRepository
     {
-        public Player GetPlayer(int id)
+        public Player GetPlayer(int playerId, int draftId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Player GetPlayer(Player player, Team team)
         {
             throw new NotImplementedException();
         }

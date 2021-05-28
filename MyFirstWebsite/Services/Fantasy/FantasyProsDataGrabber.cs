@@ -18,7 +18,7 @@ namespace MyFirstWebsite.Services
 
         public ICollection<Player> GetPlayers(ScoringType scoringType)
         {
-            string url = "";
+            string url;
 
             if (scoringType.Equals(ScoringType.HalfPPR))
             {

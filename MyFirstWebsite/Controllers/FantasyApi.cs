@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFirstWebsite.Models;
+using MyFirstWebsite.Services.Fantasy;
 using MyFirstWebsite.ViewModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -19,47 +20,57 @@ namespace MyFirstWebsite.Controllers
     {
         private readonly AppDbContext appDbContext;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IDraftService _draftService;
+        private readonly ITeamService _teamService;
+        private readonly IPlayerService _playerService;
 
-        public FantasyApi(AppDbContext appDbContext, UserManager<ApplicationUser> userManager)
+        public FantasyApi(AppDbContext appDbContext
+                        , UserManager<ApplicationUser> userManager
+                        , IDraftService draftService
+                        , ITeamService teamService
+                        , IPlayerService playerService)
         {
             this.appDbContext = appDbContext;
             this.userManager = userManager;
+            _draftService = draftService;
+            _teamService = teamService;
+            _playerService = playerService;
         }
 
         [HttpGet]
         [Route("api/[controller]/GetAvailablePlayers/{draftId}")]
         public IActionResult GetAvailablePlayers(int draftId)
         {
-            HashSet<Player> availablePlayers = appDbContext.Teams
-                .Where(t => t.DraftId == draftId && t.DraftPosition == 0)
-                .Select(t => t.Players).FirstOrDefault()
-                .OrderBy(p => p.Rank).ToHashSet();
+            List<Player> availablePlayers = 
+                _teamService.GetAvailablePlayersById(draftId).Players
+                .Select(p => new Player { Name = p.Name, Position = p.Position, Rank = p.Rank, PositionDrafted = p.PositionDrafted, PlayerUrl = p.PlayerUrl })
+                .OrderBy(p => p.Rank).ToList();
 
             return Json(availablePlayers);
         }
 
         [Route("api/[controller]/AddToTeam/{draftId}/{teamNum}")]
         [HttpPut]
-        public void AddPlayerToTeam([FromBody]Player player, int draftId, int teamNum)
+        public IActionResult AddPlayerToTeam([FromBody]Player player, int draftId, int teamNum)
         {
-            Team team = GetTeam(draftId, teamNum);
-
+            Team team = _teamService.GetTeam(draftId, teamNum);
+            Player playerToAdd = _playerService.GetPlayer(player.Id);
             team.Players.Add(player);
 
-            appDbContext.SaveChanges();
+            _teamService.UpdateTeam(team);
+            _teamService.Save();
+
+            return Ok();
         }
 
         [Route("api/[controller]/GetUserTeam/{draftId}")]
         [HttpGet]
         public IActionResult GetUserTeam(int draftId)
         {
-            int userDraftNum = appDbContext.Drafts
-                .Where(d => d.Id == draftId)
-                .Select(d => d.UserDraftPosition).FirstOrDefault();
-
-            HashSet<Player> players = GetTeam(draftId, userDraftNum).Players
-                .Select(p => new Player { Name = p.Name, Position = p.Position, Rank = p.Rank, PositionDrafted = p.PositionDrafted, PlayerUrl = p.PlayerUrl})
-                .OrderBy(p => p.PositionDrafted).ToHashSet();
+            List<Player> players = _teamService.GetUserTeamById(draftId).Players
+                .Select(p => new Player { Name = p.Name, Position = p.Position, Rank = p.Rank, PositionDrafted = p.PositionDrafted, PlayerUrl = p.PlayerUrl })
+                .OrderBy(p => p.PositionDrafted)
+                .ToList();
 
             return Json(players);
         }
@@ -68,27 +79,21 @@ namespace MyFirstWebsite.Controllers
         [HttpGet]
         public int GetNumberOfTeams(int draftId)
         {
-            return appDbContext.Drafts
-                .Where(d => d.Id == draftId)
-                .Select(d => d.NumberOfTeams).FirstOrDefault();
+            return _draftService.GetNumberOfTeams(draftId);
         }
 
         [Route("api/[controller]/GetDraftPosition/{draftId}")]
         [HttpGet]
         public int GetDraftPosition(int draftId)
         {
-            return appDbContext.Drafts
-                .Where(d => d.Id == draftId)
-                .Select(d => d.UserDraftPosition).FirstOrDefault();
+            return _draftService.getDraftPosition(draftId);
         }
 
         [Route("api/[controller]/GetDraftPickNumber/{draftId}")]
         [HttpGet]
         public int GetDraftPickNumber(int draftId)
         {
-            int pickNumber = GetPlayersDrafted(draftId).Count() + 1;
-
-            return pickNumber;
+            return _draftService.GetPickById(draftId);
         }
 
         [Route("api/[controller]/GetDraftBoard/{draftId}")]
@@ -96,9 +101,12 @@ namespace MyFirstWebsite.Controllers
         public IActionResult GetDraftBoard(int draftId)
         {
             DraftboardViewModel draftboardViewModel = new DraftboardViewModel();
-            var draft = appDbContext.Drafts.Where(d => d.Id == draftId).FirstOrDefault();
+            var draft = _draftService.GetDraft(draftId);
 
-            draftboardViewModel.Players = GetPlayersDrafted(draftId).ToHashSet();
+            draftboardViewModel.Players =
+                _teamService.GetAvailablePlayers(draft).Players
+                .OrderBy(p => p.Rank)
+                .ToHashSet();
             draftboardViewModel.NumberOfTeams = draft.NumberOfTeams;
 
             return PartialView("_Card", draftboardViewModel);
@@ -111,22 +119,21 @@ namespace MyFirstWebsite.Controllers
             return PartialView("_AddPlayerForm");
         }
 
-        [Route("api/[controller]/DeleteDraft/")]
+        [Route("api/[controller]/DeleteDraft/{draftId}")]
         [HttpDelete]
-        public void DeleteDraft([FromBody] Draft draft)
+        public IActionResult DeleteDraft(int draftId)
         {
-            appDbContext.Drafts.Remove(draft);
+            _draftService.DeleteDraftById(draftId);
+            _draftService.Save();
 
-            appDbContext.SaveChanges();
+            return Ok();
         }
 
         [Route("api/[controller]/GetAllUserDrafts/")]
         [HttpGet]
         public IActionResult GetAllUserDrafts()
         {
-            var drafts = appDbContext.ApplicationUsers
-                .Where(u => u.Id == userManager.GetUserId(User))
-                .Select(u => u.Drafts).FirstOrDefault().ToList();
+            List<Draft> drafts = _draftService.GetAllDrafts(userManager.GetUserId(User));
 
             return Json(drafts);
         }

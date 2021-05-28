@@ -8,24 +8,18 @@
         $(document).on('click', '#listOfDraftsTable button', function () {
             var teamName = $(this).closest('tr').data('teamName');
             var leageName = $(this).closest('tr').data('leagueName');
-            deleteTeam(teamName, leageName);
+            var draftLink = $(this).closest('tr').find('a').attr('href')
+            var id = draftLink.substring(draftLink.lastIndexOf('/')+1)
+            deleteDraft(id);
             $(this).closest('tr').remove();
         });
     }
 
-    function deleteTeam(teamName, leagueName) {
-        var team;
+    function deleteDraft(id) {
 
-        $.each(teams, function (i, v) {
-            if (v.leagueName === leagueName && v.teamName === teamName) {
-                team = v;
-            }
-        });
         $.ajax({
-            url: '/api/FantasyApi/DeleteDraft/',
+            url: '/api/FantasyApi/DeleteDraft/' + id,
             type: "DELETE",
-            data: JSON.stringify(team),
-            contentType: "application/json; charset=utf-8",
             processData: true,
             cache: false,
             success: function (result) {

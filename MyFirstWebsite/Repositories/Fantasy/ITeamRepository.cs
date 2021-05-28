@@ -8,8 +8,11 @@ namespace MyFirstWebsite.Repositories
 {
     public interface ITeamRepository
     {
-        Team GetTeam(int teamId, int draftId);
+        Team GetTeam(int teamId);
+        Team GetTeam(int draftId, int draftPosition);
 
-        List<Team> GetAllTeams(int draftId); 
+        List<Team> GetAllTeams(int draftId);
+        void Save();
+        void UpdateTeam(Team team);
     }
 }

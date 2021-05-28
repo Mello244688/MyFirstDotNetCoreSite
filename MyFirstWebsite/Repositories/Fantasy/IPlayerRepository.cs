@@ -8,7 +8,8 @@ namespace MyFirstWebsite.Repositories
 {
     public interface IPlayerRepository
     {
-        Player GetPlayer(int id);
+        Player GetPlayer(int playerId, int draftId);
+        Player GetPlayer(Player player, Team team);
 
         List<Team> GetPlayers(int teamId, int draftId);
     }

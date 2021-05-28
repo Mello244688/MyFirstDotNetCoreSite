@@ -11,9 +11,21 @@ namespace MyFirstWebsite.Services.Fantasy
     {
         private readonly IFantasyProsDataGrabber _fantasyProsDataGrabber;
 
-        public DraftService(AppDbContext appDbContext, IFantasyProsDataGrabber fantasyProsDataGrabber) : base(appDbContext)
+        public DraftService(AppDbContext appDbContext
+                            , IFantasyProsDataGrabber fantasyProsDataGrabber
+                            , ITeamService teamService) : base(appDbContext)
         {
             _fantasyProsDataGrabber = fantasyProsDataGrabber;
+        }
+
+        public int getDraftPosition(int draftId)
+        {
+            return GetDraft(draftId).UserDraftPosition;
+        }
+
+        public int GetNumberOfTeams(int draftId)
+        {
+            return GetDraft(draftId).NumberOfTeams;
         }
 
         public string GetPageHeading(ScoringType type)
@@ -46,6 +58,11 @@ namespace MyFirstWebsite.Services.Fantasy
             }
 
             return draftedPlayers.Count + 1;
+        }
+
+        public int GetPickById(int draftId)
+        {
+            return GetPick(GetDraft(draftId));
         }
 
         public int GetRound(int pick, int numberOfTeams)
@@ -109,6 +126,7 @@ namespace MyFirstWebsite.Services.Fantasy
             draft.UserDraftPosition = newDraft.DraftPosition;
             draft.LeagueName = newDraft.LeagueName;
             draft.UserId = userId;
+            draft.DateCreated = DateTime.Now;
 
             return draft;
         }
