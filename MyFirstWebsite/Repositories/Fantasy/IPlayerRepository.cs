@@ -10,7 +10,7 @@ namespace MyFirstWebsite.Repositories
     {
         Player GetPlayer(int playerId, int draftId);
         Player GetPlayer(Player player, Team team);
-
+        Player GetPlayer(Player player, int draftId);
         List<Team> GetPlayers(int teamId, int draftId);
     }
 }

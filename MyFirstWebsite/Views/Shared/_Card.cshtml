@@ -15,7 +15,7 @@
             }
             @if (Model.Players.ElementAt(k).PositionDrafted == Model.Players.Count)
             {
-                <div class="card col-md-1 ml-auto">
+                <div class="card col ml-auto">
                     <div class="card-body">
                         <h6 class="card-title">@Model.Players.ElementAt(k).Name</h6>
                         <footer>
@@ -28,7 +28,7 @@
             }
             else
             {
-                <div class="card col-md-1">
+                <div class="card col">
                     <div class="card-body">
                         <h6 class="card-title">@Model.Players.ElementAt(k).Name</h6>
                         <footer>
@@ -43,7 +43,7 @@
         }
         else
         {
-            <div class="card col-md-1">
+            <div class="card col">
                 <div class="card-body">
                     <h6 class="card-title">@Model.Players.ElementAt(j).Name</h6>
                     <footer>

@@ -20,6 +20,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.33" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.6" />
@@ -33,6 +34,18 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.6" />
   </ItemGroup>
 
+  <!--<PropertyGroup>
+    <ResolveStaticWebAssetsInputsDependsOn>RemoveIdentityAssets</ResolveStaticWebAssetsInputsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="RemoveIdentityAssets">
+    <ItemGroup>
+      <StaticWebAsset Remove="@(StaticWebAsset)" Condition="%(SourceId) == 'Microsoft.AspNetCore.Identity.UI'" />
+    </ItemGroup>
+    
+  </Target>-->
 </Project>

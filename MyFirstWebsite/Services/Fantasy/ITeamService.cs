@@ -13,6 +13,7 @@ namespace MyFirstWebsite.Services.Fantasy
         Team GetAvailablePlayersById(int draftId);
         Team GetUserTeam(Draft draft);
         Team GetUserTeamById(int draftId);
+        List<Player> GetDraftedPlayers(int draftId);
 
     }
 }

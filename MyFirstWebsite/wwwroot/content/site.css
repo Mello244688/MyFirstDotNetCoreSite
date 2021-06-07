@@ -97,6 +97,11 @@ table {
     margin: 0 !important;
 }
 
+#draftBoard {
+    display: grid;
+    grid-auto-rows: 1fr;
+}
+
 .bottom-right {
     right: 0;
     bottom: 0;

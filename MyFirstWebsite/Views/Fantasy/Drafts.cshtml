@@ -15,6 +15,7 @@
     @foreach (var draft in Model)
     {
         <tbody>
+            @Html.AntiForgeryToken()
             <tr data-team-name="@draft.Teams.Where(t => t.DraftPosition == draft.UserDraftPosition).FirstOrDefault().TeamName" data-league-name="@draft.LeagueName">
                 <td class="ml-auto"><a asp-controller="Fantasy" asp-action="Draft" asp-route-id="@draft.Id">League: @draft.LeagueName Team: @draft.Teams.Where(t => t.DraftPosition == draft.UserDraftPosition).FirstOrDefault().TeamName</a></td>
                 <td id="dateTimeDraftCreated">@draft.DateCreated</td>

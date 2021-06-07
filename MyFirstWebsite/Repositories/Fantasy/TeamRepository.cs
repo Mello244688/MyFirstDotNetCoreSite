@@ -18,9 +18,10 @@ namespace MyFirstWebsite.Repositories.Fantasy
 
         public List<Team> GetAllTeams(int draftId)
         {
-            return (List<Team>)_appDbContext.Teams
+            return _appDbContext.Teams
                 .Where(ts => ts.DraftId == draftId)
-                .Include(t => t.Players);
+                .Include(t => t.Players)
+                .ToList();
         }
 
         public Team GetTeam(int teamId)

@@ -6,11 +6,11 @@
     var draftedPlayers = [];
     var playersEdited = [];
     var numTeams;
-    var draftPosition = getDraftPosition(idStr);
+    var draftPosition; //users draft position
     var pickCounter = parseInt($('#pickVal').text());
     var round = parseInt($('#roundVal').text());
 
-    console.log(pickCounter);
+    getDraftPosition(idStr)
     setUpEventListeners();
     hideDraftBoard();
 
@@ -75,6 +75,7 @@
         });
 
         $(document).on('click', '#editDraftButton', function () {
+            setDraftedPlayers(idStr);
             editDraft();
         });
 
@@ -170,8 +171,6 @@
 
     function getUserTeam(draftId) {
 
-        var tableRow = $('#teamTable tr:contains(position)');
-
         $.ajax({
             url: "/api/FantasyApi/GetUserTeam/" + draftId,
             type: "GET",
@@ -232,7 +231,7 @@
             contentType: "application/json; charset=utf-8",
             processData: true,
             success: function (result) {
-                return result;
+                draftPosition = result;
             }
         }).responseJSON;
     }
@@ -240,6 +239,7 @@
     function AddPlayerToTeam(draftId, teamNum, player) {
 
         player.positionDrafted = pickCounter;
+        var isPlayerTurn = isTurn(round, numTeams, pickCounter);
 
         $.ajax({
             url: '/api/FantasyApi/AddToTeam/' + draftId + '/' + teamNum,
@@ -249,7 +249,7 @@
             processData: true,
             cache: false,
             success: function (result) {
-                if (isTurn(round, numTeams, draftPosition, pickCounter)) {
+                if (isPlayerTurn) {
                     getUserTeam(idStr);
                 }
 
@@ -270,7 +270,8 @@
         round = Math.ceil(pickCounter / numTeams);
     }
 
-    function isTurn(r, numTeams, draftPick, numPicks) {
+    function isTurn(r, numTeams, numPicks) {
+        draftPick = draftPosition;
         if (r % 2 == 0) {
 
             return (r * numTeams - draftPick + 1) == numPicks;
@@ -295,6 +296,25 @@
         $('#draftBoard').show();
         $('#draftBoardButton').parent().parent().removeClass('col-md-3');
         $('#draftbutton').parent().parent().addClass('col-md-3');  
+    }
+
+    function setDraftedPlayers(draftId) {
+        $.ajax({
+            url: '/api/FantasyApi/GetDraftedPlayers/' + draftId,
+            type: 'GET',
+            contentType: "application/json; charset=utf-8",
+            cache: false,
+            success: function (result) {
+                $.each(result, function (i, v) {
+                    draftedPlayers.push({
+                        name: v.name,
+                        position: v.position,
+                        rank: v.rank,
+                        positionDrafted: v.positionDrafted
+                    });
+                });
+            }
+        });
     }
 
     function setupDraftBoardColors() {
@@ -330,13 +350,17 @@
             draftButton.removeClass('btn-secondary disabled').addClass('btn-primary').prop('disabled', false);
             editButton.text('Edit');
             $('.card').removeClass('edit-effect');
+
             removeCardClickEvent();
-            swapDraftedPlayers(playersEdited, idStr);
-        } else {
+            //TODO: Save changes to drafted players, update teams etc.
+        }
+        else
+        {
             editButton.removeClass('btn-primary').addClass('btn-danger active');
             draftButton.removeClass('btn-primary').addClass('disabled btn-secondary').prop('disabled', true);
             editButton.text('Save');
             $('.card').addClass('edit-effect');
+
             setupCardClickEvent();
         }
     }
@@ -352,7 +376,7 @@
             }
 
             if ($('.card-selected').length > 1) {
-                swapCards();
+                shiftCards();
             }
             
         });
@@ -363,80 +387,60 @@
         $('.card').removeClass('card-selected');
     }
 
-    function swapCards() {
-
-        if ($('.card-selected').length > 1) {
-            var card1 = $('.card-selected').eq(0);
-            var card2 = $('.card-selected').eq(1);
-
-            var card1NameElement = card1.children().children().get(0);
-            var card1PositionElement = card1.children().children().eq(1).children().get(0);
-            var card2NameElement = card2.children().children().get(0);
-            var card2PositionElement = card2.children().children().eq(1).children().get(0);
-
-            var name1 = card1NameElement.innerText.trim();
-            var name2 = card2NameElement.innerText.trim();
-            var position1 = card1PositionElement.innerText.trim();
-            var position2 = card2PositionElement.innerText.trim();
-
-            card1NameElement.innerText = name2;
-            card1PositionElement.innerText = position2;
-            card2NameElement.innerText = name1;
-            card2PositionElement.innerText = position1;
-
-            setupDraftBoardColors();
-            $('.card').removeClass('card-selected');
-
-            var indexesToRemove = [];
-
-            $.each(playersEdited, function (i, v) {
-     
-                if (v.name.includes(name1) || v.name.includes(name2)) {
-                    indexesToRemove.push(i);
-                }
-            });
-
-            for (var i = indexesToRemove.length - 1; i >= 0; i--) {
-                playersEdited.splice(indexesToRemove[i], 1);
-            }
-
-            var player1;
-            var player2;
-
-            $.each(draftedPlayers, function (i, v) {
-                if (v.name.includes(name1)) {
-                    player1 = v;
-                }
-                else if (v.name.includes(name2)) {
-                    player2 = v;
-                }
-            });
-            var temp = player1.positionDrafted;
-            player1.positionDrafted = player2.positionDrafted;
-            player2.positionDrafted = temp;
-
-            playersEdited.push(player1);
-            playersEdited.push(player2);
+    function shiftCards() {
+        if ($('.card-selected').length !== 2) {
+            return;
         }
-    }
 
-    //TODO: need to fix to swap players on teams
-    function swapDraftedPlayers(players, draftId) {
-        
-        $.ajax({
-            url: '/api/FantasyApi/SwapDraftedPlayers/' + draftId,
-            type: 'PUT',
-            data: JSON.stringify(players),
-            contentType: "application/json; charset=utf-8",
-            processData: true,
-            cache: false,
-            success: function (result) {
-                getUserTeam(idStr);
-                $('#teamTable tbody tr').children('td:nth-child(2)').remove();
-                $('#teamTable tbody tr').children('td:nth-child(2)');
-                playersEdited = [];
+        //get the 2 selected card
+        var card1 = $('.card-selected').eq(0);
+        var card2 = $('.card-selected').eq(1);
+
+        //get the elements for player name and position
+        var card1NameElement = card1.children().children().get(0);
+        var card1PositionElement = card1.children().children().eq(1).children().get(0);
+        var card2NameElement = card2.children().children().get(0);
+        var card2PositionElement = card2.children().children().eq(1).children().get(0);
+
+        //get the text for name and position
+        var name1 = card1NameElement.innerText.trim();
+        var name2 = card2NameElement.innerText.trim();
+        var position1 = card1PositionElement.innerText.trim();
+        var position2 = card2PositionElement.innerText.trim();
+
+        var shiftedPlayerIndices = [];
+
+        /*make sure players are sorted by position drafted*/
+        sortPlayersByDrafted(draftedPlayers);
+ 
+        $.each(draftedPlayers, function (i, v) {
+            if (v.name.includes(name1) && v.position.includes(position1) || v.name.includes(name2) && v.position.includes(position2)) {
+                shiftedPlayerIndices.push(i);
             }
         });
+
+        var largerIndex = shiftedPlayerIndices.pop();
+        var smallerIndex = shiftedPlayerIndices.pop();
+
+        for (var i = 0; i < draftedPlayers.length; i++) {
+            if (i === smallerIndex) {
+                var tempPosDrafted = draftedPlayers[i].positionDrafted;
+                draftedPlayers[largerIndex].positionDrafted = tempPosDrafted;
+                draftedPlayers[i].positionDrafted = tempPosDrafted + 1;
+            }
+            else if (i > smallerIndex && i !== largerIndex) {
+                console.log(draftedPlayers[i]);
+                var tempPos = draftedPlayers[i].positionDrafted;
+                draftedPlayers[i].positionDrafted = tempPos + 1;
+                console.log(draftedPlayers[i]);
+            }
+        }
+
+        updateDraftBoardUi(draftedPlayers, idStr);
+    }
+
+    function sortPlayersByDrafted(players) {
+        players.sort((pos1, pos2) => (pos1.positionDrafted > pos2.positionDrafted) ? 1 : -1)
     }
 
     function hideShowTeam() {
@@ -483,7 +487,7 @@
         var player = {
             name: name,
             position: position,
-            rank: players.length
+            positionDrafted: pickCounter
         };
 
         closeForm();
@@ -535,12 +539,23 @@
         return '<a href="' + player.playerLink + '" target="_blank">' + player.name + '</a>'
     }
 
-    /**
-     * This is for draft info such as pickNumber, round, numberOfDraftTeams, etc.
-     * Don't really want seperate API calls for this stuff
-     * @param {any} draftId
-     */
-    function getDraftInfo(draftId) {
-
+    function updateDraftBoardUi(draftedPlayers, draftId) {
+        $.ajax({
+            url: '/api/FantasyApi/GetDraftBoardUi/' + draftId,
+            type: "PUT",
+            data: JSON.stringify(draftedPlayers),
+            contentType: "application/json; charset=utf-8",
+            processData: true,
+            cache: false,
+            success: function (result) {
+                removeCardClickEvent()
+                $('#draftBoard').html(result);
+                setupCardClickEvent();
+                setupDraftBoardColors();
+                $('.card').addClass('edit-effect');
+            },
+            error: function (result) {
+            }
+        });
     }
 });

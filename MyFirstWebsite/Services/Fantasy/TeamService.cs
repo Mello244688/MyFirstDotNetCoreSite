@@ -1,6 +1,7 @@
 ﻿using MyFirstWebsite.Models;
 using MyFirstWebsite.Repositories;
 using MyFirstWebsite.Repositories.Fantasy;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MyFirstWebsite.Services.Fantasy
@@ -28,6 +29,18 @@ namespace MyFirstWebsite.Services.Fantasy
             Draft draft = _draftRepository.GetDraft(draftId);
             
             return draft.Teams.Where(ts => ts.DraftPosition == 0).FirstOrDefault();
+        }
+
+        public List<Player> GetDraftedPlayers(int draftId)
+        {
+            List<Player> draftedPlayers = new List<Player>();
+
+            foreach (var team in GetAllTeams(draftId).Skip(1)) //first is available players
+            {
+                draftedPlayers.AddRange(team.Players);
+            }
+
+            return draftedPlayers.OrderBy(p => p.PositionDrafted).ToList();
         }
 
         public Team GetUserTeam(Draft draft)
