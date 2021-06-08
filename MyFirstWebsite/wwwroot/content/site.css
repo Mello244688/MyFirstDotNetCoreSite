@@ -59,6 +59,19 @@ table {
     background-color: white !important;
 }
 
+#draftBoardButtonGroup, #saveDraftBoardButtonGroup {
+    display: none;
+    padding: 0;
+}
+
+#body-row > div.col-md-12.mb-3 {
+    padding: 0;
+}
+
+#draftInfoRow > div.col-md-4.bdr {
+    padding: 0;
+}
+
 #draftTable, #teamTable {
     border-collapse: collapse; /* Collapse borders */
     /*width: 100%;*/ /* Full-width */
@@ -100,6 +113,10 @@ table {
 #draftBoard {
     display: grid;
     grid-auto-rows: 1fr;
+}
+
+#body-row > div.col-md-12.mb-3 > div {
+    margin: 0 !important;
 }
 
 .bottom-right {

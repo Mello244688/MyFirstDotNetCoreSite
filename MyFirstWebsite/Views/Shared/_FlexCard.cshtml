@@ -1,0 +1,43 @@
+﻿@model DraftboardViewModel
+
+@{int numPlayersLastRow = (Model.Players.Count % Model.NumberOfTeams > 0) ? Model.Players.Count % Model.NumberOfTeams : Model.NumberOfTeams; }
+@{int numberofRows = (int)Math.Ceiling((double)Model.Players.Count / Model.NumberOfTeams); }
+@for (int i = 0; i < numberofRows; i++)
+{
+    @if (i % 2 == 0)
+    {
+        <div class="d-flex flex-row">
+            @for (int y = 1; y <= (i == numberofRows-1 ? numPlayersLastRow : Model.NumberOfTeams); y++)
+            {
+                <div class="card col ml-auto flex-item">
+                    <div class="card-body">
+                        <h6 class="card-title">@Model.Players.ElementAt((y + Model.NumberOfTeams * i)-1).Name</h6>
+                        <footer>
+                            <small class="text-muted bottom-right">
+                                @Model.Players.ElementAt(y + (Model.NumberOfTeams * i) - 1).Position
+                            </small>
+                        </footer>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-row-reverse">
+            @for (int y = 1; y <= (i == numberofRows-1 ? numPlayersLastRow : Model.NumberOfTeams); y++)
+            {
+                <div class="card col ml-auto flex-item">
+                    <div class="card-body">
+                        <h6 class="card-title">@Model.Players.ElementAt((y + Model.NumberOfTeams * i) - 1).Name</h6>
+                        <footer>
+                            <small class="text-muted bottom-right">
+                                @Model.Players.ElementAt(y + (Model.NumberOfTeams * i) - 1).Position
+                            </small>
+                        </footer>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}

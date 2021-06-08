@@ -53,25 +53,9 @@
         });
 
         $(document).on('click', '#draftBoardButton', function () {
-
-            $.ajax({
-                url: '/api/FantasyApi/GetDraftBoard/' + idStr,
-                type: "GET",
-                //contentType: "application/json",
-                //dataType: "html",
-                success: function (result) {
-                    hideDraft();
-                    $('#draftBoard').html(result);
-                    setupDraftBoardColors();
-                },
-                error: function (result) {
-                }
-            });
-        });
-
-        $(document).on('click', '#draftButton', function () {
-            hideDraftBoard();
-           
+            hideDraft();
+            showDraftBoard();
+            getDraftBoard(idStr);
         });
 
         $(document).on('click', '#editDraftButton', function () {
@@ -81,6 +65,23 @@
 
         $(document).on('click', '#hideShowTeamButton', function () {
             hideShowTeam();
+        });
+
+        $(document).on('click', '#showDraftButton', function () {
+            hideDraftBoard();
+            showDraft();
+        });
+
+        $(document).on('click', '#saveDraftChanges', function () {
+            //TODO: save changes
+        });
+
+        $(document).on('click', '#cancelDraftChanges', function () {
+            $('.card').removeClass('edit-effect');
+            removeCardClickEvent();
+            getDraftBoard(idStr);
+            $('#saveDraftBoardButtonGroup').hide();
+            $('#draftBoardButtonGroup').css('display', 'flex');
         });
 
         $(document).on('change', '#filterPositions', function () {
@@ -280,25 +281,29 @@
 
     }
 
-    function hideDraftBoard() {
-        $('#draftBoard').hide();
-        $('#draftButton').parent().parent().hide();
-        $('#draftContent').show();
-        $('#draftBoardButton').parent().parent().show();
-        $('#draftbutton').parent().parent().removeClass('col-md-3');
-        $('#draftBoardButton').parent().parent().addClass('col-md-3');
+    function hideDraft() {
+        $('#draftButtonGroup').hide();
+        $('#draftContent').hide();
     }
 
-    function hideDraft() {
-        $('#draftContent').hide();
-        $('#draftButton').parent().parent().show();
-        $('#draftBoardButton').parent().parent().hide();
+    function hideDraftBoard() {
+        $('#draftBoard').hide();
+        $('#draftBoardButtonGroup').hide();
+    }
+
+    function showDraft() {
+        $('#draftButtonGroup').css('display', 'flex');
+        $('#draftContent').show();
+    }
+
+    function showDraftBoard() {
         $('#draftBoard').show();
-        $('#draftBoardButton').parent().parent().removeClass('col-md-3');
-        $('#draftbutton').parent().parent().addClass('col-md-3');  
+        $('#draftBoardButtonGroup').css('display', 'flex');
     }
 
     function setDraftedPlayers(draftId) {
+        draftedPlayers = [];
+
         $.ajax({
             url: '/api/FantasyApi/GetDraftedPlayers/' + draftId,
             type: 'GET',
@@ -342,27 +347,12 @@
     }
 
     function editDraft() {
-        var editButton = $('#editDraftButton');
-        var draftButton = $('#draftButton');
 
-        if (draftButton.prop('disabled')) {
-            editButton.removeClass('btn-danger active').addClass('btn-primary');
-            draftButton.removeClass('btn-secondary disabled').addClass('btn-primary').prop('disabled', false);
-            editButton.text('Edit');
-            $('.card').removeClass('edit-effect');
+        $('#draftBoardButtonGroup').hide();
+        $('#saveDraftBoardButtonGroup').css('display', 'flex');
+        $('.card').addClass('edit-effect');
 
-            removeCardClickEvent();
-            //TODO: Save changes to drafted players, update teams etc.
-        }
-        else
-        {
-            editButton.removeClass('btn-primary').addClass('btn-danger active');
-            draftButton.removeClass('btn-primary').addClass('disabled btn-secondary').prop('disabled', true);
-            editButton.text('Save');
-            $('.card').addClass('edit-effect');
-
-            setupCardClickEvent();
-        }
+        setupCardClickEvent();
     }
 
     function setupCardClickEvent() {
@@ -429,14 +419,13 @@
                 draftedPlayers[i].positionDrafted = tempPosDrafted + 1;
             }
             else if (i > smallerIndex && i !== largerIndex) {
-                console.log(draftedPlayers[i]);
                 var tempPos = draftedPlayers[i].positionDrafted;
                 draftedPlayers[i].positionDrafted = tempPos + 1;
-                console.log(draftedPlayers[i]);
             }
         }
-
-        updateDraftBoardUi(draftedPlayers, idStr);
+        sortPlayersByDrafted(draftedPlayers);
+        //updateDraftBoardUi(draftedPlayers, idStr);
+        updateDraftBoardCards(draftedPlayers);
     }
 
     function sortPlayersByDrafted(players) {
@@ -514,6 +503,24 @@
         });
     }
 
+    function getDraftBoard(draftId) {
+        $.ajax({
+            url: '/api/FantasyApi/GetDraftBoard/' + draftId,
+            type: "GET",
+            //contentType: "application/json",
+            //dataType: "html",
+            success: function (result) {
+                $('#draftBoard').show();
+                $('#draftBoard').html(result);
+                var percent = (1 / numTeams) * 100;
+                $(".flex-item").css("flex", "0 0 " + percent + "%");
+                setupDraftBoardColors();
+            },
+            error: function (result) {
+            }
+        });
+    }
+
     function getTeamNum(roundNum, pickNum, numTeams) {
 
         var mnum = 0;
@@ -557,5 +564,16 @@
             error: function (result) {
             }
         });
+    }
+
+    function updateDraftBoardCards(draftedPlayers) {
+
+        $("#draftBoard .card-body").each(function (i) {
+
+            $(this).children(".card-title").get(0).innerText = draftedPlayers[i].name;
+            $(this).find("footer small").get(0).innerText = draftedPlayers[i].position;
+        });
+        $('.card').removeClass('card-selected');
+        setupDraftBoardColors();
     }
 });

@@ -121,7 +121,7 @@ namespace MyFirstWebsite.Controllers
                 .ToHashSet();
             draftboardViewModel.NumberOfTeams = draft.NumberOfTeams;
 
-            return PartialView("_Card", draftboardViewModel);
+            return PartialView("_FlexCard", draftboardViewModel);
         }
 
         [Route("api/[controller]/GetAddPlayerForm")]
