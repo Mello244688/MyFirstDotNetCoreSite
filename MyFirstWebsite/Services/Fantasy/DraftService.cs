@@ -10,12 +10,14 @@ namespace MyFirstWebsite.Services.Fantasy
     public class DraftService : DraftRepository, IDraftService
     {
         private readonly IFantasyProsDataGrabber _fantasyProsDataGrabber;
+        private readonly ITeamService _teamService;
 
         public DraftService(AppDbContext appDbContext
                             , IFantasyProsDataGrabber fantasyProsDataGrabber
                             , ITeamService teamService) : base(appDbContext)
         {
             _fantasyProsDataGrabber = fantasyProsDataGrabber;
+            _teamService = teamService;
         }
 
         public int getDraftPosition(int draftId)
@@ -129,6 +131,54 @@ namespace MyFirstWebsite.Services.Fantasy
             draft.DateCreated = DateTime.Now;
 
             return draft;
+        }
+
+        public void UpdateDraftTeams(List<Player> playersDrafted, int draftId)
+        {
+            Draft draft = GetDraft(draftId);
+            List<Team> teams = draft.Teams.OrderBy(t => t.DraftPosition).ToList();
+            List<Player> players = _teamService.GetDraftedPlayers(draftId).OrderBy(p => p.Rank).ToList();
+            playersDrafted = playersDrafted.OrderBy(p => p.Rank).ToList();
+
+            if (playersDrafted.Count != players.Count)
+            {
+                // return error
+            }
+
+            foreach (var team in teams.Skip(1)) //skip first
+            {
+                team.Players.Clear();
+            }
+
+            for (int i = 0; i < playersDrafted.Count; i++)
+            {
+                players[i].PositionDrafted = playersDrafted[i].PositionDrafted;
+                players[i].Team = null;
+            }
+
+            players = players.OrderBy(p => p.PositionDrafted).ToList();
+ 
+            for (int i = 0; i < players.Count; i++)
+            {
+                int round = (int)Math.Ceiling((double)players[i].PositionDrafted / draft.NumberOfTeams);
+                int teamNum;
+
+                if (round % 2 == 1)
+                {
+                    teamNum = players[i].PositionDrafted - (round - 1) * draft.NumberOfTeams;
+                }
+                else
+                {
+                    teamNum = round * draft.NumberOfTeams + 1 - players[i].PositionDrafted;
+                }
+
+                Team team = teams.Where(t => t.DraftPosition == teamNum).FirstOrDefault();
+                players[i].Team = team;
+                players[i].TeamId = team.Id;
+                team.Players.Add(players[i]);
+            }
+
+            UpdateDraft(draft);
         }
     }
 }

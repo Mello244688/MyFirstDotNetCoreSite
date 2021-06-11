@@ -14,5 +14,6 @@ namespace MyFirstWebsite.Services.Fantasy
         int GetRound(int pick, int numberOfTeams);
         int GetNumberOfTeams(int draftId);
         Draft SetupDraft(NewViewModel newViewModel, string userId);
+        void UpdateDraftTeams(List<Player> playersDrafted, int draftId);
     }
 }

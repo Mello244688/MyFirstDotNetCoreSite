@@ -10,7 +10,6 @@ namespace MyFirstWebsite.Repositories
     {
         Team GetTeam(int teamId);
         Team GetTeam(int draftId, int draftPosition);
-
         List<Team> GetAllTeams(int draftId);
         void Save();
         void UpdateTeam(Team team);

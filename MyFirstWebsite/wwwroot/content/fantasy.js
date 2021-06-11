@@ -4,13 +4,12 @@
     var idStr = url.substring(url.lastIndexOf('/') + 1);
     var players = [];
     var draftedPlayers = [];
-    var playersEdited = [];
     var numTeams;
     var draftPosition; //users draft position
     var pickCounter = parseInt($('#pickVal').text());
     var round = parseInt($('#roundVal').text());
 
-    getDraftPosition(idStr)
+    getDraftPosition(idStr);
     setUpEventListeners();
     hideDraftBoard();
 
@@ -70,18 +69,18 @@
         $(document).on('click', '#showDraftButton', function () {
             hideDraftBoard();
             showDraft();
+            getUserTeam(idStr);
         });
 
         $(document).on('click', '#saveDraftChanges', function () {
-            //TODO: save changes
+            cancelSaveDraftBoardCleanup();
+            updateDraftTeams(draftedPlayers, idStr);
+            
         });
 
         $(document).on('click', '#cancelDraftChanges', function () {
-            $('.card').removeClass('edit-effect');
-            removeCardClickEvent();
+            cancelSaveDraftBoardCleanup()
             getDraftBoard(idStr);
-            $('#saveDraftBoardButtonGroup').hide();
-            $('#draftBoardButtonGroup').css('display', 'flex');
         });
 
         $(document).on('change', '#filterPositions', function () {
@@ -100,6 +99,13 @@
         $(document).on('click', '#closeFormButton', function () {
             closeForm();
         });
+    }
+
+    function cancelSaveDraftBoardCleanup() {
+        $('.card').removeClass('edit-effect');
+        removeCardClickEvent();
+        $('#saveDraftBoardButtonGroup').hide();
+        $('#draftBoardButtonGroup').css('display', 'flex');
     }
 
     function getAvailablePlayers(draftId) {
@@ -179,6 +185,7 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (result) {
+                $('#teamTable > tbody').find('a').closest('td').remove();
                 $.each(result, function (i, v) {
 
                     var position = v.position.replace(/[^a-z]/gi, '').toUpperCase();
@@ -414,16 +421,20 @@
 
         for (var i = 0; i < draftedPlayers.length; i++) {
             if (i === smallerIndex) {
+                
                 var tempPosDrafted = draftedPlayers[i].positionDrafted;
                 draftedPlayers[largerIndex].positionDrafted = tempPosDrafted;
                 draftedPlayers[i].positionDrafted = tempPosDrafted + 1;
             }
-            else if (i > smallerIndex && i !== largerIndex) {
+            else if (i > smallerIndex && i < largerIndex) {
+
                 var tempPos = draftedPlayers[i].positionDrafted;
                 draftedPlayers[i].positionDrafted = tempPos + 1;
             }
         }
+        console.log(draftedPlayers);
         sortPlayersByDrafted(draftedPlayers);
+
         //updateDraftBoardUi(draftedPlayers, idStr);
         updateDraftBoardCards(draftedPlayers);
     }
@@ -575,5 +586,22 @@
         });
         $('.card').removeClass('card-selected');
         setupDraftBoardColors();
+    }
+
+    function updateDraftTeams(draftedPlayers, draftId) {
+
+        $.ajax({
+            url: '/api/FantasyApi/UpdateDraftTeams/' + draftId,
+            type: "PUT",
+            data: JSON.stringify(draftedPlayers),
+            contentType: "application/json; charset=utf-8",
+            processData: true,
+            cache: false,
+            success: function (result) {
+
+            },
+            error: function (result) {
+            }
+        });
     }
 });

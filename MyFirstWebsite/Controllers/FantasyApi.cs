@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MyFirstWebsite.Models;
 using MyFirstWebsite.Services.Fantasy;
 using MyFirstWebsite.ViewModels;
-using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -208,5 +203,15 @@ namespace MyFirstWebsite.Controllers
         //        Rank = playersDrafted.ElementAt(i).Rank
         //    };
         //}
+
+        [Route("api/[controller]/UpdateDraftTeams/{draftId}")]
+        [HttpPut]
+        public IActionResult UpdateDraftTeams([FromBody] List<Player> draftedPlayers, int draftId)
+        {
+            _draftService.UpdateDraftTeams(draftedPlayers, draftId);
+            _draftService.Save();
+
+            return Ok();
+        }
     }
 }
